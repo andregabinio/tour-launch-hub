@@ -105,4 +105,15 @@
   .glass-card {
     @apply bg-card border border-border shadow-sm hover:shadow-md transition-shadow duration-200;
   }
+
+  /* Custom scrollbar for timeline */
+  .overflow-x-auto::-webkit-scrollbar {
+    height: 8px;
+  }
+  .overflow-x-auto::-webkit-scrollbar-track {
+    @apply bg-muted rounded-full;
+  }
+  .overflow-x-auto::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full hover:bg-muted-foreground/30;
+  }
 }
