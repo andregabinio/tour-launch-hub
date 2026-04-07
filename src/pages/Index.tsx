@@ -6,6 +6,7 @@ import SummaryCards from '@/components/roadmap/SummaryCards';
 import Filters, { FilterState, defaultFilters } from '@/components/roadmap/Filters';
 import TimelineRoadmap from '@/components/roadmap/TimelineRoadmap';
 import TableView from '@/components/roadmap/TableView';
+import UserManagement from '@/components/admin/UserManagement';
 
 const prioridadeOrder = { alta: 0, média: 1, baixa: 2 };
 
@@ -99,6 +100,7 @@ const Index = () => {
           <TableView acoes={filteredAcoes} />
         )}
       </main>
+      <UserManagement open={showAdmin} onOpenChange={setShowAdmin} />
     </div>
   );
 };
