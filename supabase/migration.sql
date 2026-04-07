@@ -19,8 +19,8 @@ $$ LANGUAGE sql SECURITY DEFINER STABLE;
 -- =============================================================================
 CREATE TABLE IF NOT EXISTS public.profiles (
   id          UUID        PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  nome        TEXT,
-  email       TEXT,
+  nome        TEXT        NOT NULL DEFAULT '',
+  email       TEXT        NOT NULL DEFAULT '',
   role        TEXT        NOT NULL DEFAULT 'viewer'
                           CHECK (role IN ('admin', 'editor', 'viewer')),
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -83,7 +83,7 @@ BEGIN
   VALUES (
     NEW.id,
     NEW.email,
-    COALESCE(NEW.raw_user_meta_data->>'nome', NEW.raw_user_meta_data->>'full_name', ''),
+    COALESCE(NEW.raw_user_meta_data->>'nome', ''),
     'viewer'
   );
   RETURN NEW;
@@ -104,10 +104,10 @@ CREATE TABLE IF NOT EXISTS public.macro_etapas (
   id          TEXT    PRIMARY KEY,
   nome        TEXT    NOT NULL,
   descricao   TEXT,
-  cor         TEXT,
-  cor_bg      TEXT,
-  cor_border  TEXT,
-  ordem       INTEGER NOT NULL
+  cor         TEXT        NOT NULL DEFAULT '',
+  cor_bg      TEXT        NOT NULL DEFAULT '',
+  cor_border  TEXT        NOT NULL DEFAULT '',
+  ordem       INTEGER     NOT NULL DEFAULT 0
 );
 
 ALTER TABLE public.macro_etapas ENABLE ROW LEVEL SECURITY;
@@ -139,18 +139,18 @@ CREATE POLICY "macro_etapas: admin delete"
 CREATE TABLE IF NOT EXISTS public.acoes (
   id              TEXT        PRIMARY KEY,
   titulo          TEXT        NOT NULL,
-  descricao       TEXT,
+  descricao       TEXT        NOT NULL DEFAULT '',
   macro_etapa_id  TEXT        NOT NULL REFERENCES public.macro_etapas(id) ON DELETE RESTRICT,
   responsavel     TEXT,
-  prioridade      TEXT        NOT NULL DEFAULT 'media'
-                              CHECK (prioridade IN ('alta', 'media', 'baixa')),
-  status          TEXT        NOT NULL DEFAULT 'pendente'
-                              CHECK (status IN ('pendente', 'em_andamento', 'concluido', 'bloqueado')),
-  situacao_prazo  TEXT        NOT NULL DEFAULT 'no_prazo'
-                              CHECK (situacao_prazo IN ('no_prazo', 'atrasado', 'concluido_antes', 'sem_prazo')),
+  prioridade      TEXT        NOT NULL DEFAULT 'média'
+                              CHECK (prioridade IN ('alta', 'média', 'baixa')),
+  status          TEXT        NOT NULL DEFAULT 'não iniciada'
+                              CHECK (status IN ('não iniciada', 'em andamento', 'concluída')),
+  situacao_prazo  TEXT        NOT NULL DEFAULT 'no prazo'
+                              CHECK (situacao_prazo IN ('no prazo', 'atrasada')),
   tempo_estimado  TEXT,
-  data_inicio     DATE,
-  data_fim        DATE,
+  data_inicio     DATE        NOT NULL,
+  data_fim        DATE        NOT NULL,
   dependencia_de  TEXT        REFERENCES public.acoes(id) ON DELETE SET NULL,
   created_by      UUID        REFERENCES public.profiles(id) ON DELETE SET NULL,
   created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -193,8 +193,8 @@ CREATE TABLE IF NOT EXISTS public.subtarefas (
   id              UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   acao_id         TEXT        NOT NULL REFERENCES public.acoes(id) ON DELETE CASCADE,
   titulo          TEXT        NOT NULL,
-  status          TEXT        NOT NULL DEFAULT 'pendente'
-                              CHECK (status IN ('pendente', 'em_andamento', 'concluido')),
+  status          TEXT        NOT NULL DEFAULT 'não iniciada'
+                              CHECK (status IN ('não iniciada', 'em andamento', 'concluída')),
   responsavel     TEXT,
   tempo_estimado  TEXT,
   created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
