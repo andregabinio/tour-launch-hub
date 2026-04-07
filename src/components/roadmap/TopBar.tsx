@@ -16,10 +16,10 @@ const TopBar = ({ viewMode, onViewModeChange }: TopBarProps) => {
           </div>
           <div>
             <h1 className="text-xl font-bold tracking-tight text-foreground">
-              TOUR Launch Roadmap
+              Roadmap de Lançamento do TOUR
             </h1>
             <p className="text-sm text-muted-foreground">
-              Planejamento e acompanhamento do lançamento
+              Planejamento e acompanhamento estratégico
             </p>
           </div>
         </div>

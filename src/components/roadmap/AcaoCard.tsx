@@ -27,7 +27,6 @@ const AcaoCard = ({ acao, allAcoes }: AcaoCardProps) => {
   return (
     <div className={`glass-card rounded-lg ${borderClass} overflow-hidden`}>
       <div className="p-4 space-y-3">
-        {/* Header */}
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
@@ -45,20 +44,18 @@ const AcaoCard = ({ acao, allAcoes }: AcaoCardProps) => {
           </div>
         </div>
 
-        {/* Meta */}
         <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
           <span className="flex items-center gap-1">
             <User className="h-3.5 w-3.5" /> {acao.responsavel}
           </span>
           <span className="flex items-center gap-1">
-            <Calendar className="h-3.5 w-3.5" /> {new Date(acao.prazo).toLocaleDateString('pt-BR')}
+            <Calendar className="h-3.5 w-3.5" /> {new Date(acao.dataInicio).toLocaleDateString('pt-BR')} — {new Date(acao.dataFim).toLocaleDateString('pt-BR')}
           </span>
           <span className="flex items-center gap-1">
             <Clock className="h-3.5 w-3.5" /> {acao.tempoEstimado}
           </span>
         </div>
 
-        {/* Dependency */}
         {depAcao && (
           <div className={`flex items-center gap-1.5 text-xs rounded-md px-2.5 py-1.5 ${
             acao.bloqueada
@@ -71,7 +68,6 @@ const AcaoCard = ({ acao, allAcoes }: AcaoCardProps) => {
           </div>
         )}
 
-        {/* Subtarefas toggle */}
         {acao.subtarefas.length > 0 && (
           <button
             onClick={() => setExpanded(!expanded)}
@@ -86,7 +82,6 @@ const AcaoCard = ({ acao, allAcoes }: AcaoCardProps) => {
         )}
       </div>
 
-      {/* Subtarefas expanded */}
       {expanded && (
         <div className="border-t border-border bg-muted/30 px-4 py-3 space-y-2">
           {acao.subtarefas.map((sub) => (
@@ -95,8 +90,8 @@ const AcaoCard = ({ acao, allAcoes }: AcaoCardProps) => {
               <span className={`flex-1 ${sub.status === 'concluída' ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
                 {sub.titulo}
               </span>
-              <span className="text-muted-foreground hidden sm:inline">{sub.responsavel}</span>
-              <span className="text-muted-foreground">{sub.tempoEstimado}</span>
+              {sub.responsavel && <span className="text-muted-foreground hidden sm:inline">{sub.responsavel}</span>}
+              {sub.tempoEstimado && <span className="text-muted-foreground">{sub.tempoEstimado}</span>}
             </div>
           ))}
         </div>

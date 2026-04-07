@@ -4,7 +4,7 @@ import { Acao } from '@/types/roadmap';
 import TopBar from '@/components/roadmap/TopBar';
 import SummaryCards from '@/components/roadmap/SummaryCards';
 import Filters, { FilterState, defaultFilters } from '@/components/roadmap/Filters';
-import RoadmapView from '@/components/roadmap/RoadmapView';
+import TimelineRoadmap from '@/components/roadmap/TimelineRoadmap';
 import TableView from '@/components/roadmap/TableView';
 
 const prioridadeOrder = { alta: 0, média: 1, baixa: 2 };
@@ -13,7 +13,6 @@ const Index = () => {
   const [viewMode, setViewMode] = useState<'roadmap' | 'tabela'>('roadmap');
   const [filters, setFilters] = useState<FilterState>(defaultFilters);
 
-  // Process blocked status
   const processedAcoes: Acao[] = useMemo(() => {
     return acoesMock.map((acao) => {
       if (acao.dependenciaDe) {
@@ -26,7 +25,6 @@ const Index = () => {
     });
   }, []);
 
-  // Filter
   const filteredAcoes = useMemo(() => {
     let result = processedAcoes;
 
@@ -55,11 +53,10 @@ const Index = () => {
       result = result.filter(a => a.situacaoPrazo === filters.situacaoPrazo);
     }
 
-    // Sort
     result = [...result].sort((a, b) => {
       switch (filters.ordenarPor) {
         case 'prazo':
-          return new Date(a.prazo).getTime() - new Date(b.prazo).getTime();
+          return new Date(a.dataInicio).getTime() - new Date(b.dataInicio).getTime();
         case 'prioridade':
           return prioridadeOrder[a.prioridade] - prioridadeOrder[b.prioridade];
         case 'responsavel':
@@ -75,11 +72,11 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <TopBar viewMode={viewMode} onViewModeChange={setViewMode} />
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 space-y-6">
+      <main className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8 space-y-6">
         <SummaryCards acoes={processedAcoes} />
         <Filters filters={filters} onChange={setFilters} />
         {viewMode === 'roadmap' ? (
-          <RoadmapView acoes={filteredAcoes} allAcoes={processedAcoes} />
+          <TimelineRoadmap acoes={filteredAcoes} allAcoes={processedAcoes} />
         ) : (
           <TableView acoes={filteredAcoes} />
         )}

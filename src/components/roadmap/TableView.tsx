@@ -35,9 +35,13 @@ const TableView = ({ acoes }: TableViewProps) => {
               <TableHead>Responsável</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Prioridade</TableHead>
-              <TableHead>Prazo</TableHead>
+              <TableHead>Início</TableHead>
+              <TableHead>Fim</TableHead>
               <TableHead>Situação</TableHead>
+              <TableHead>Tempo Est.</TableHead>
+              <TableHead>Dependência</TableHead>
               <TableHead className="text-center">Subtarefas</TableHead>
+              <TableHead>Bloqueada</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -65,13 +69,21 @@ const TableView = ({ acoes }: TableViewProps) => {
                   <PrioridadeBadge prioridade={acao.prioridade} />
                 </TableCell>
                 <TableCell className="text-xs">
-                  {new Date(acao.prazo).toLocaleDateString('pt-BR')}
+                  {new Date(acao.dataInicio).toLocaleDateString('pt-BR')}
+                </TableCell>
+                <TableCell className="text-xs">
+                  {new Date(acao.dataFim).toLocaleDateString('pt-BR')}
                 </TableCell>
                 <TableCell>
                   <SituacaoPrazoBadge situacao={acao.situacaoPrazo} />
                 </TableCell>
+                <TableCell className="text-xs">{acao.tempoEstimado}</TableCell>
+                <TableCell className="text-xs text-muted-foreground">{acao.dependenciaDe || '—'}</TableCell>
                 <TableCell className="text-center text-xs text-muted-foreground">
                   {acao.subtarefas.filter(s => s.status === 'concluída').length}/{acao.subtarefas.length}
+                </TableCell>
+                <TableCell className="text-xs">
+                  {acao.bloqueada ? <span className="text-blocked font-medium">Sim</span> : '—'}
                 </TableCell>
               </TableRow>
             ))}

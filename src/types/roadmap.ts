@@ -6,8 +6,8 @@ export interface Subtarefa {
   id: string;
   titulo: string;
   status: Status;
-  responsavel: string;
-  tempoEstimado: string;
+  responsavel?: string;
+  tempoEstimado?: string;
 }
 
 export interface Acao {
@@ -20,8 +20,18 @@ export interface Acao {
   status: Status;
   situacaoPrazo: SituacaoPrazo;
   tempoEstimado: string;
-  prazo: string;
+  dataInicio: string;
+  dataFim: string;
   dependenciaDe: string | null;
   subtarefas: Subtarefa[];
   bloqueada?: boolean;
+}
+
+export interface MacroEtapa {
+  id: string;
+  titulo: string;
+  descricao?: string;
+  cor: string;
+  corBg: string;
+  corBorder: string;
 }
