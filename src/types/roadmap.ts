@@ -35,3 +35,14 @@ export interface MacroEtapa {
   corBg: string;
   corBorder: string;
 }
+
+export type UserRole = 'admin' | 'editor' | 'viewer';
+
+export interface Profile {
+  id: string;
+  nome: string;
+  email: string;
+  role: UserRole;
+  created_at: string;
+  updated_at: string;
+}
