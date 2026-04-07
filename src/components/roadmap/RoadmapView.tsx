@@ -1,10 +1,10 @@
-import { Acao } from '@/types/roadmap';
-import { MACRO_ETAPAS } from '@/data/mockData';
+import { Acao, MacroEtapa } from '@/types/roadmap';
 import AcaoCard from './AcaoCard';
 
 interface RoadmapViewProps {
   acoes: Acao[];
   allAcoes: Acao[];
+  macroEtapas: MacroEtapa[];
 }
 
 const etapaColors: Record<string, string> = {
@@ -16,10 +16,10 @@ const etapaColors: Record<string, string> = {
   'Pós-lançamento': 'bg-muted text-muted-foreground border-border',
 };
 
-const RoadmapView = ({ acoes, allAcoes }: RoadmapViewProps) => {
-  const etapasComAcoes = MACRO_ETAPAS.filter(etapa =>
-    acoes.some(a => a.macroEtapa === etapa)
-  );
+const RoadmapView = ({ acoes, allAcoes, macroEtapas }: RoadmapViewProps) => {
+  const etapasComAcoes = macroEtapas
+    .map(e => e.titulo)
+    .filter(etapa => acoes.some(a => a.macroEtapa === etapa));
 
   if (acoes.length === 0) {
     return (

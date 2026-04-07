@@ -1,7 +1,6 @@
 import { useState, useMemo, useRef } from 'react';
 import { ChevronDown, ChevronUp, User, Clock, Link, Lock, AlertTriangle } from 'lucide-react';
 import { Acao, MacroEtapa } from '@/types/roadmap';
-import { MACRO_ETAPAS_DATA } from '@/data/mockData';
 import { StatusBadge, PrioridadeBadge, SituacaoPrazoBadge } from './StatusBadge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 interface TimelineRoadmapProps {
   acoes: Acao[];
   allAcoes: Acao[];
+  macroEtapas: MacroEtapa[];
 }
 
 const COLUMN_WIDTH = 120;
@@ -141,7 +141,7 @@ const AcaoDetail = ({ acao, allAcoes, onClose }: { acao: Acao; allAcoes: Acao[];
   );
 };
 
-const TimelineRoadmap = ({ acoes, allAcoes }: TimelineRoadmapProps) => {
+const TimelineRoadmap = ({ acoes, allAcoes, macroEtapas }: TimelineRoadmapProps) => {
   const [selectedAcao, setSelectedAcao] = useState<Acao | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -169,7 +169,7 @@ const TimelineRoadmap = ({ acoes, allAcoes }: TimelineRoadmapProps) => {
 
   // Group actions by macro etapa and stack overlapping ones
   const etapasWithAcoes = useMemo(() => {
-    return MACRO_ETAPAS_DATA.map(etapa => {
+    return macroEtapas.map(etapa => {
       const etapaAcoes = acoes.filter(a => a.macroEtapa === etapa.titulo);
       
       // Simple row stacking to avoid overlap

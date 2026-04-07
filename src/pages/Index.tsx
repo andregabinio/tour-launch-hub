@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useAcoes } from '@/hooks/useAcoes';
+import { useMacroEtapas } from '@/hooks/useMacroEtapas';
 import { Acao } from '@/types/roadmap';
 import TopBar from '@/components/roadmap/TopBar';
 import SummaryCards from '@/components/roadmap/SummaryCards';
@@ -15,6 +16,7 @@ const Index = () => {
   const [filters, setFilters] = useState<FilterState>(defaultFilters);
   const [showAdmin, setShowAdmin] = useState(false);
   const { data: acoes = [], isLoading, error } = useAcoes();
+  const { data: macroEtapas = [] } = useMacroEtapas();
 
   const processedAcoes: Acao[] = useMemo(() => {
     return acoes.map((acao) => {
@@ -95,7 +97,7 @@ const Index = () => {
         <SummaryCards acoes={processedAcoes} />
         <Filters filters={filters} onChange={setFilters} acoes={processedAcoes} />
         {viewMode === 'roadmap' ? (
-          <TimelineRoadmap acoes={filteredAcoes} allAcoes={processedAcoes} />
+          <TimelineRoadmap acoes={filteredAcoes} allAcoes={processedAcoes} macroEtapas={macroEtapas} />
         ) : (
           <TableView acoes={filteredAcoes} />
         )}

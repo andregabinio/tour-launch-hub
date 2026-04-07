@@ -23,9 +23,11 @@ interface UserManagementProps {
 }
 
 const UserManagement = ({ open, onOpenChange }: UserManagementProps) => {
-  const { user } = useAuthContext();
+  const { user, role } = useAuthContext();
   const [users, setUsers] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
+
+  if (role !== 'admin') return null;
 
   useEffect(() => {
     if (open) {
