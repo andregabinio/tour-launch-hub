@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { acoesMock } from '@/data/mockData';
+import { useAcoes } from '@/hooks/useAcoes';
 import { Acao } from '@/types/roadmap';
 import TopBar from '@/components/roadmap/TopBar';
 import SummaryCards from '@/components/roadmap/SummaryCards';
@@ -12,18 +12,20 @@ const prioridadeOrder = { alta: 0, média: 1, baixa: 2 };
 const Index = () => {
   const [viewMode, setViewMode] = useState<'roadmap' | 'tabela'>('roadmap');
   const [filters, setFilters] = useState<FilterState>(defaultFilters);
+  const [showAdmin, setShowAdmin] = useState(false);
+  const { data: acoes = [], isLoading, error } = useAcoes();
 
   const processedAcoes: Acao[] = useMemo(() => {
-    return acoesMock.map((acao) => {
+    return acoes.map((acao) => {
       if (acao.dependenciaDe) {
-        const dep = acoesMock.find(a => a.id === acao.dependenciaDe);
+        const dep = acoes.find(a => a.id === acao.dependenciaDe);
         if (dep && dep.status !== 'concluída') {
           return { ...acao, bloqueada: true };
         }
       }
       return { ...acao, bloqueada: false };
     });
-  }, []);
+  }, [acoes]);
 
   const filteredAcoes = useMemo(() => {
     let result = processedAcoes;
@@ -69,12 +71,28 @@ const Index = () => {
     return result;
   }, [processedAcoes, filters]);
 
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-muted-foreground">Carregando dados...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-destructive">Erro ao carregar dados: {error.message}</div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
-      <TopBar viewMode={viewMode} onViewModeChange={setViewMode} />
+      <TopBar viewMode={viewMode} onViewModeChange={setViewMode} onOpenAdmin={() => setShowAdmin(true)} />
       <main className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8 space-y-6">
         <SummaryCards acoes={processedAcoes} />
-        <Filters filters={filters} onChange={setFilters} />
+        <Filters filters={filters} onChange={setFilters} acoes={processedAcoes} />
         {viewMode === 'roadmap' ? (
           <TimelineRoadmap acoes={filteredAcoes} allAcoes={processedAcoes} />
         ) : (

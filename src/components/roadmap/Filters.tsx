@@ -2,7 +2,7 @@ import { Search, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { MACRO_ETAPAS, RESPONSAVEIS } from '@/data/mockData';
+import { type Acao } from '@/types/roadmap';
 
 export interface FilterState {
   busca: string;
@@ -17,6 +17,7 @@ export interface FilterState {
 interface FiltersProps {
   filters: FilterState;
   onChange: (filters: FilterState) => void;
+  acoes: Acao[];
 }
 
 const defaultFilters: FilterState = {
@@ -29,7 +30,10 @@ const defaultFilters: FilterState = {
   ordenarPor: 'prazo',
 };
 
-const Filters = ({ filters, onChange }: FiltersProps) => {
+const Filters = ({ filters, onChange, acoes }: FiltersProps) => {
+  const macroEtapas = [...new Set(acoes.map(a => a.macroEtapa))];
+  const responsaveis = [...new Set(acoes.map(a => a.responsavel))].sort();
+
   const update = (key: keyof FilterState, value: string) =>
     onChange({ ...filters, [key]: value });
 
@@ -60,14 +64,14 @@ const Filters = ({ filters, onChange }: FiltersProps) => {
           <SelectTrigger className="w-[180px]"><SelectValue placeholder="Macro etapa" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="todas">Todas as etapas</SelectItem>
-            {MACRO_ETAPAS.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}
+            {macroEtapas.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={filters.responsavel} onValueChange={(v) => update('responsavel', v)}>
           <SelectTrigger className="w-[170px]"><SelectValue placeholder="Responsável" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="todos">Todos</SelectItem>
-            {RESPONSAVEIS.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
+            {responsaveis.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={filters.prioridade} onValueChange={(v) => update('prioridade', v)}>
