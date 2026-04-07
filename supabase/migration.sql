@@ -10,7 +10,8 @@
 CREATE OR REPLACE FUNCTION get_user_role()
 RETURNS TEXT AS $$
   SELECT role FROM public.profiles WHERE id = auth.uid();
-$$ LANGUAGE sql SECURITY DEFINER STABLE;
+$$ LANGUAGE sql SECURITY DEFINER STABLE
+SET search_path = public;
 
 
 -- =============================================================================
@@ -32,7 +33,7 @@ ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 -- All authenticated users can read any profile
 CREATE POLICY "profiles: authenticated select"
   ON public.profiles FOR SELECT
-  USING (auth.role() = 'authenticated');
+  USING (auth.uid() IS NOT NULL);
 
 -- Users can update their own profile
 CREATE POLICY "profiles: own update"
@@ -41,9 +42,9 @@ CREATE POLICY "profiles: own update"
   WITH CHECK (auth.uid() = id);
 
 -- Admin full CRUD
-CREATE POLICY "profiles: admin insert"
-  ON public.profiles FOR INSERT
-  WITH CHECK (get_user_role() = 'admin');
+CREATE POLICY "profiles: self insert"
+  ON public.profiles FOR INSERT TO authenticated
+  WITH CHECK (auth.uid() = id);
 
 CREATE POLICY "profiles: admin update all"
   ON public.profiles FOR UPDATE
@@ -64,7 +65,8 @@ BEGIN
   NEW.updated_at = now();
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = public;
 
 CREATE TRIGGER set_profiles_updated_at
   BEFORE UPDATE ON public.profiles
@@ -88,7 +90,8 @@ BEGIN
   );
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = public;
 
 CREATE OR REPLACE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
@@ -115,7 +118,7 @@ ALTER TABLE public.macro_etapas ENABLE ROW LEVEL SECURITY;
 -- All authenticated users can read
 CREATE POLICY "macro_etapas: authenticated select"
   ON public.macro_etapas FOR SELECT
-  USING (auth.role() = 'authenticated');
+  USING (auth.uid() IS NOT NULL);
 
 -- Admin CRUD
 CREATE POLICY "macro_etapas: admin insert"
@@ -167,7 +170,7 @@ CREATE TRIGGER set_acoes_updated_at
 -- All authenticated users can read
 CREATE POLICY "acoes: authenticated select"
   ON public.acoes FOR SELECT
-  USING (auth.role() = 'authenticated');
+  USING (auth.uid() IS NOT NULL);
 
 -- Editor and admin can create/update
 CREATE POLICY "acoes: editor insert"
@@ -211,7 +214,7 @@ CREATE TRIGGER set_subtarefas_updated_at
 -- All authenticated users can read
 CREATE POLICY "subtarefas: authenticated select"
   ON public.subtarefas FOR SELECT
-  USING (auth.role() = 'authenticated');
+  USING (auth.uid() IS NOT NULL);
 
 -- Editor and admin can create/update
 CREATE POLICY "subtarefas: editor insert"
