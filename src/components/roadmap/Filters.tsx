@@ -11,6 +11,7 @@ export interface FilterState {
   prioridade: string;
   status: string;
   situacaoPrazo: string;
+  bloqueada: string;
   ordenarPor: string;
 }
 
@@ -27,6 +28,7 @@ const defaultFilters: FilterState = {
   prioridade: 'todas',
   status: 'todos',
   situacaoPrazo: 'todas',
+  bloqueada: 'todas',
   ordenarPor: 'prazo',
 };
 

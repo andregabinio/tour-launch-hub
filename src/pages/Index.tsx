@@ -3,7 +3,7 @@ import { useAcoes } from '@/hooks/useAcoes';
 import { useMacroEtapas } from '@/hooks/useMacroEtapas';
 import { Acao } from '@/types/roadmap';
 import TopBar from '@/components/roadmap/TopBar';
-import SummaryCards from '@/components/roadmap/SummaryCards';
+import SummaryCards, { type CardFilterKey } from '@/components/roadmap/SummaryCards';
 import Filters, { FilterState, defaultFilters } from '@/components/roadmap/Filters';
 import TimelineRoadmap from '@/components/roadmap/TimelineRoadmap';
 import TableView from '@/components/roadmap/TableView';
@@ -15,11 +15,42 @@ const prioridadeOrder = { alta: 0, média: 1, baixa: 2 };
 const Index = () => {
   const [viewMode, setViewMode] = useState<'roadmap' | 'tabela'>('roadmap');
   const [filters, setFilters] = useState<FilterState>(defaultFilters);
+  const [activeCard, setActiveCard] = useState<CardFilterKey | null>(null);
   const [showAdmin, setShowAdmin] = useState(false);
   const [editingAcao, setEditingAcao] = useState<Acao | null>(null);
   const [showCreateAcao, setShowCreateAcao] = useState(false);
   const { data: acoes = [], isLoading, error } = useAcoes();
   const { data: macroEtapas = [] } = useMacroEtapas();
+
+  const handleCardClick = (key: CardFilterKey) => {
+    if (activeCard === key) {
+      setActiveCard(null);
+      setFilters(defaultFilters);
+      return;
+    }
+    setActiveCard(key);
+    const newFilters = { ...defaultFilters };
+    switch (key) {
+      case 'total':
+        break;
+      case 'em andamento':
+        newFilters.status = 'em andamento';
+        break;
+      case 'concluída':
+        newFilters.status = 'concluída';
+        break;
+      case 'atrasada':
+        newFilters.situacaoPrazo = 'atrasada';
+        break;
+      case 'bloqueada':
+        newFilters.bloqueada = 'sim';
+        break;
+      case 'alta':
+        newFilters.prioridade = 'alta';
+        break;
+    }
+    setFilters(newFilters);
+  };
 
   const processedAcoes: Acao[] = useMemo(() => {
     return acoes.map((acao) => {
@@ -59,6 +90,11 @@ const Index = () => {
     }
     if (filters.situacaoPrazo !== 'todas') {
       result = result.filter(a => a.situacaoPrazo === filters.situacaoPrazo);
+    }
+    if (filters.bloqueada === 'sim') {
+      result = result.filter(a => a.bloqueada);
+    } else if (filters.bloqueada === 'não') {
+      result = result.filter(a => !a.bloqueada);
     }
 
     result = [...result].sort((a, b) => {
@@ -102,8 +138,8 @@ const Index = () => {
         onCreateAcao={() => setShowCreateAcao(true)}
       />
       <main className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8 space-y-6">
-        <SummaryCards acoes={processedAcoes} />
-        <Filters filters={filters} onChange={setFilters} acoes={processedAcoes} />
+        <SummaryCards acoes={processedAcoes} activeCard={activeCard} onCardClick={handleCardClick} />
+        <Filters filters={filters} onChange={(f) => { setActiveCard(null); setFilters(f); }} acoes={processedAcoes} />
         {viewMode === 'roadmap' ? (
           <TimelineRoadmap
             acoes={filteredAcoes}

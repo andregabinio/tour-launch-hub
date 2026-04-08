@@ -36,7 +36,25 @@ export function useUpdateSubtarefa() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onMutate: async ({ id, ...updates }) => {
+      await queryClient.cancelQueries({ queryKey: ['acoes'] });
+      const previous = queryClient.getQueryData(['acoes']);
+      queryClient.setQueryData(['acoes'], (old: any[]) =>
+        old?.map((acao: any) => ({
+          ...acao,
+          subtarefas: acao.subtarefas?.map((sub: any) =>
+            sub.id === id ? { ...sub, ...updates } : sub
+          ),
+        }))
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['acoes'], context.previous);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['acoes'] });
     },
   });
