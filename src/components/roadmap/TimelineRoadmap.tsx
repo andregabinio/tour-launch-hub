@@ -1,14 +1,20 @@
 import { useState, useMemo, useRef } from 'react';
-import { ChevronDown, ChevronUp, User, Clock, Link, Lock, AlertTriangle } from 'lucide-react';
+import { ChevronDown, ChevronUp, User, Clock, Link, Lock, AlertTriangle, Pencil } from 'lucide-react';
 import { Acao, MacroEtapa } from '@/types/roadmap';
 import { StatusBadge, PrioridadeBadge, SituacaoPrazoBadge } from './StatusBadge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { useUpdateSubtarefa } from '@/hooks/useSubtarefas';
+import { useUpdateAcao } from '@/hooks/useAcoes';
+import { toast } from 'sonner';
 
 interface TimelineRoadmapProps {
   acoes: Acao[];
   allAcoes: Acao[];
   macroEtapas: MacroEtapa[];
+  onEditAcao?: (acao: Acao) => void;
 }
 
 const COLUMN_WIDTH = 120;
@@ -65,9 +71,34 @@ function getMonthHeaders(columns: { label: string; start: Date; end: Date }[]): 
 }
 
 // Expanded card overlay
-const AcaoDetail = ({ acao, allAcoes, onClose }: { acao: Acao; allAcoes: Acao[]; onClose: () => void }) => {
+const AcaoDetail = ({ acao, allAcoes, onClose, onEdit }: { acao: Acao; allAcoes: Acao[]; onClose: () => void; onEdit?: (acao: Acao) => void }) => {
   const [showSubs, setShowSubs] = useState(true);
   const depAcao = acao.dependenciaDe ? allAcoes.find(a => a.id === acao.dependenciaDe) : null;
+  const { role } = useAuthContext();
+  const updateSubtarefa = useUpdateSubtarefa();
+  const updateAcao = useUpdateAcao();
+  const canEdit = role === 'admin' || role === 'editor';
+
+  const cycleStatus = async () => {
+    if (!canEdit) return;
+    const next = acao.status === 'não iniciada' ? 'em andamento' : acao.status === 'em andamento' ? 'concluída' : 'não iniciada';
+    try {
+      await updateAcao.mutateAsync({ id: acao.id, status: next });
+      onClose();
+    } catch (e: any) {
+      toast.error(e.message || 'Erro ao atualizar status');
+    }
+  };
+
+  const toggleSub = async (subId: string, currentStatus: string) => {
+    if (!canEdit) return;
+    const next = currentStatus === 'concluída' ? 'não iniciada' : 'concluída';
+    try {
+      await updateSubtarefa.mutateAsync({ id: subId, status: next });
+    } catch (e: any) {
+      toast.error(e.message || 'Erro ao atualizar subtarefa');
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/20 backdrop-blur-sm" onClick={onClose}>
@@ -78,9 +109,16 @@ const AcaoDetail = ({ acao, allAcoes, onClose }: { acao: Acao; allAcoes: Acao[];
         <div className="p-5 space-y-4">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs font-mono text-muted-foreground">{acao.id}</span>
-            <StatusBadge status={acao.status} bloqueada={acao.bloqueada} />
+            <button onClick={cycleStatus} className={canEdit ? 'cursor-pointer hover:opacity-80' : ''} disabled={!canEdit}>
+              <StatusBadge status={acao.status} bloqueada={acao.bloqueada} />
+            </button>
             <PrioridadeBadge prioridade={acao.prioridade} />
             <SituacaoPrazoBadge situacao={acao.situacaoPrazo} />
+            {canEdit && onEdit && (
+              <Button variant="ghost" size="sm" className="ml-auto h-7 gap-1.5 text-xs" onClick={() => { onEdit(acao); onClose(); }}>
+                <Pencil className="h-3.5 w-3.5" /> Editar
+              </Button>
+            )}
           </div>
           <h3 className="text-base font-semibold text-foreground">{acao.titulo}</h3>
           <p className="text-sm text-muted-foreground">{acao.descricao}</p>
@@ -117,7 +155,12 @@ const AcaoDetail = ({ acao, allAcoes, onClose }: { acao: Acao; allAcoes: Acao[];
                 <div className="border-t border-border pt-3 space-y-2">
                   {acao.subtarefas.map(sub => (
                     <div key={sub.id} className="flex items-center gap-3 text-xs">
-                      <Checkbox checked={sub.status === 'concluída'} disabled className="h-4 w-4" />
+                      <Checkbox
+                        checked={sub.status === 'concluída'}
+                        disabled={!canEdit}
+                        onCheckedChange={() => toggleSub(sub.id, sub.status)}
+                        className="h-4 w-4"
+                      />
                       <span className={`flex-1 ${sub.status === 'concluída' ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
                         {sub.titulo}
                       </span>
@@ -141,7 +184,7 @@ const AcaoDetail = ({ acao, allAcoes, onClose }: { acao: Acao; allAcoes: Acao[];
   );
 };
 
-const TimelineRoadmap = ({ acoes, allAcoes, macroEtapas }: TimelineRoadmapProps) => {
+const TimelineRoadmap = ({ acoes, allAcoes, macroEtapas, onEditAcao }: TimelineRoadmapProps) => {
   const [selectedAcao, setSelectedAcao] = useState<Acao | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -357,7 +400,7 @@ const TimelineRoadmap = ({ acoes, allAcoes, macroEtapas }: TimelineRoadmapProps)
 
       {/* Detail overlay */}
       {selectedAcao && (
-        <AcaoDetail acao={selectedAcao} allAcoes={allAcoes} onClose={() => setSelectedAcao(null)} />
+        <AcaoDetail acao={selectedAcao} allAcoes={allAcoes} onClose={() => setSelectedAcao(null)} onEdit={onEditAcao} />
       )}
     </>
   );
