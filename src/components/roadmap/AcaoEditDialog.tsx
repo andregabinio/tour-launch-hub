@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Trash2 } from 'lucide-react';
 import { useMacroEtapas } from '@/hooks/useMacroEtapas';
-import { useCreateAcao, useUpdateAcao } from '@/hooks/useAcoes';
+import { useCreateAcao, useUpdateAcao, useDeleteAcao } from '@/hooks/useAcoes';
 import { Acao } from '@/types/roadmap';
 import { toast } from 'sonner';
 
@@ -23,6 +25,7 @@ const AcaoEditDialog = ({ open, onOpenChange, acao, allAcoes = [], projetoId }: 
   const { data: macroEtapas = [] } = useMacroEtapas(projetoId);
   const createAcao = useCreateAcao();
   const updateAcao = useUpdateAcao();
+  const deleteAcao = useDeleteAcao();
 
   const [form, setForm] = useState({
     id: '',
@@ -57,9 +60,8 @@ const AcaoEditDialog = ({ open, onOpenChange, acao, allAcoes = [], projetoId }: 
         dependencia_de: acao.dependenciaDe || '',
       });
     } else {
-      const nextId = `A${String((allAcoes?.length || 0) + 1).padStart(3, '0')}`;
       setForm({
-        id: nextId,
+        id: '',
         titulo: '',
         descricao: '',
         macro_etapa_id: macroEtapas[0]?.id || '',
@@ -94,7 +96,8 @@ const AcaoEditDialog = ({ open, onOpenChange, acao, allAcoes = [], projetoId }: 
         await updateAcao.mutateAsync({ id, ...updates });
         toast.success('Ação atualizada!');
       } else {
-        await createAcao.mutateAsync(payload as any);
+        const { id: _id, ...createPayload } = payload;
+        await createAcao.mutateAsync(createPayload as any);
         toast.success('Ação criada!');
       }
       onOpenChange(false);
@@ -112,11 +115,13 @@ const AcaoEditDialog = ({ open, onOpenChange, acao, allAcoes = [], projetoId }: 
           <DialogTitle>{isEdit ? 'Editar Ação' : 'Nova Ação'}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label>ID</Label>
-              <Input value={form.id} onChange={e => set('id', e.target.value)} disabled={isEdit} />
-            </div>
+          <div className={`grid ${isEdit ? 'grid-cols-2' : 'grid-cols-1'} gap-3`}>
+            {isEdit && (
+              <div className="space-y-1.5">
+                <Label>ID</Label>
+                <Input value={form.id} disabled />
+              </div>
+            )}
             <div className="space-y-1.5">
               <Label>Macro Etapa *</Label>
               <Select value={form.macro_etapa_id} onValueChange={v => set('macro_etapa_id', v)}>
@@ -204,11 +209,49 @@ const AcaoEditDialog = ({ open, onOpenChange, acao, allAcoes = [], projetoId }: 
             </Select>
           </div>
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-          <Button onClick={handleSubmit} disabled={createAcao.isPending || updateAcao.isPending}>
-            {(createAcao.isPending || updateAcao.isPending) ? 'Salvando...' : 'Salvar'}
-          </Button>
+        <DialogFooter className="flex-row justify-between sm:justify-between">
+          {isEdit ? (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" className="text-destructive hover:text-destructive hover:bg-destructive/10 gap-1.5">
+                  <Trash2 className="h-4 w-4" /> Excluir
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Excluir ação?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    A ação <strong>{acao?.id} — {acao?.titulo}</strong> e todas as suas subtarefas serão excluídas permanentemente.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    onClick={async () => {
+                      try {
+                        await deleteAcao.mutateAsync(acao!.id);
+                        toast.success('Ação excluída!');
+                        onOpenChange(false);
+                      } catch (e: any) {
+                        toast.error(e.message || 'Erro ao excluir ação');
+                      }
+                    }}
+                  >
+                    Excluir
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          ) : (
+            <div />
+          )}
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+            <Button onClick={handleSubmit} disabled={createAcao.isPending || updateAcao.isPending}>
+              {(createAcao.isPending || updateAcao.isPending) ? 'Salvando...' : 'Salvar'}
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

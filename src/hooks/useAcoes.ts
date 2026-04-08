@@ -73,7 +73,7 @@ export function useCreateAcao() {
 
   return useMutation({
     mutationFn: async (acao: {
-      id: string;
+      id?: string;
       titulo: string;
       descricao: string;
       macro_etapa_id: string;
@@ -86,7 +86,9 @@ export function useCreateAcao() {
       data_fim: string;
       dependencia_de: string | null;
     }) => {
-      const { data, error } = await supabase.from('acoes').insert(acao).select().single();
+      const { id, ...rest } = acao;
+      const payload = id ? { id, ...rest } : rest;
+      const { data, error } = await supabase.from('acoes').insert(payload).select().single();
       if (error) throw error;
       return data;
     },
@@ -117,10 +119,52 @@ export function useUpdateAcao() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onMutate: async ({ id, ...updates }) => {
+      await queryClient.cancelQueries({ queryKey: ['acoes'] });
+      const queries = queryClient.getQueriesData<Acao[]>({ queryKey: ['acoes'] });
+      const snapshots: [readonly unknown[], Acao[] | undefined][] = [];
+      for (const [key, data] of queries) {
+        snapshots.push([key, data]);
+        if (data) {
+          queryClient.setQueryData<Acao[]>(key as string[], data.map(a =>
+            a.id === id ? { ...a, ...camelizeUpdates(updates) } : a
+          ));
+        }
+      }
+      return { snapshots };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.snapshots) {
+        for (const [key, data] of context.snapshots) {
+          queryClient.setQueryData(key, data);
+        }
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['acoes'] });
     },
   });
+}
+
+function camelizeUpdates(updates: Record<string, unknown>): Partial<Acao> {
+  const map: Record<string, string> = {
+    status: 'status',
+    titulo: 'titulo',
+    descricao: 'descricao',
+    responsavel: 'responsavel',
+    prioridade: 'prioridade',
+    situacao_prazo: 'situacaoPrazo',
+    tempo_estimado: 'tempoEstimado',
+    data_inicio: 'dataInicio',
+    data_fim: 'dataFim',
+    dependencia_de: 'dependenciaDe',
+  };
+  const result: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(updates)) {
+    const camel = map[key] || key;
+    result[camel] = value;
+  }
+  return result as Partial<Acao>;
 }
 
 export function useDeleteAcao() {

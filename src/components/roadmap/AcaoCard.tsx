@@ -6,7 +6,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { useUpdateAcao } from '@/hooks/useAcoes';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { useUpdateAcao, useDeleteAcao } from '@/hooks/useAcoes';
 import { useUpdateSubtarefa, useCreateSubtarefa, useDeleteSubtarefa } from '@/hooks/useSubtarefas';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -23,6 +24,7 @@ const AcaoCard = ({ acao, allAcoes, onEdit }: AcaoCardProps) => {
   const [showAddSub, setShowAddSub] = useState(false);
   const { role } = useAuthContext();
   const updateAcao = useUpdateAcao();
+  const deleteAcao = useDeleteAcao();
   const updateSubtarefa = useUpdateSubtarefa();
   const createSubtarefa = useCreateSubtarefa();
   const deleteSubtarefa = useDeleteSubtarefa();
@@ -120,10 +122,45 @@ const AcaoCard = ({ acao, allAcoes, onEdit }: AcaoCardProps) => {
               {acao.descricao}
             </p>
           </div>
-          {canEdit && onEdit && (
-            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => onEdit(acao)} aria-label={`Editar ação ${acao.id}`}>
-              <Pencil className="h-4 w-4" aria-hidden="true" />
-            </Button>
+          {canEdit && (
+            <div className="flex items-center gap-1 shrink-0">
+              {onEdit && (
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(acao)} aria-label={`Editar ação ${acao.id}`}>
+                  <Pencil className="h-4 w-4" aria-hidden="true" />
+                </Button>
+              )}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10" aria-label={`Excluir ação ${acao.id}`}>
+                    <Trash2 className="h-4 w-4" aria-hidden="true" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Excluir ação?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      A ação <strong>{acao.id} — {acao.titulo}</strong> e todas as suas subtarefas serão excluídas permanentemente.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      onClick={async () => {
+                        try {
+                          await deleteAcao.mutateAsync(acao.id);
+                          toast.success('Ação excluída!');
+                        } catch (e: any) {
+                          toast.error(e.message || 'Erro ao excluir ação');
+                        }
+                      }}
+                    >
+                      Excluir
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
           )}
         </div>
 

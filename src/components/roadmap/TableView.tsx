@@ -2,9 +2,10 @@ import { Acao } from '@/types/roadmap';
 import { StatusBadge, PrioridadeBadge, SituacaoPrazoBadge } from './StatusBadge';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { Pencil } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Pencil, Trash2 } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
-import { useUpdateAcao } from '@/hooks/useAcoes';
+import { useUpdateAcao, useDeleteAcao } from '@/hooks/useAcoes';
 import { toast } from 'sonner';
 import {
   Table,
@@ -24,6 +25,7 @@ const TableView = ({ acoes, onEditAcao }: TableViewProps) => {
   const { role } = useAuthContext();
   const canEdit = role === 'admin' || role === 'editor';
   const updateAcao = useUpdateAcao();
+  const deleteAcao = useDeleteAcao();
 
   const cycleStatus = async (acao: Acao) => {
     if (!canEdit) return;
@@ -63,7 +65,7 @@ const TableView = ({ acoes, onEditAcao }: TableViewProps) => {
               <TableHead className="hidden xl:table-cell">Dependência</TableHead>
               <TableHead className="text-center hidden sm:table-cell">Subtarefas</TableHead>
               <TableHead className="hidden xl:table-cell">Bloqueada</TableHead>
-              {canEdit && <TableHead className="w-[50px]"></TableHead>}
+              {canEdit && <TableHead className="w-[80px]"></TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -124,9 +126,42 @@ const TableView = ({ acoes, onEditAcao }: TableViewProps) => {
                 </TableCell>
                 {canEdit && (
                   <TableCell>
-                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEditAcao?.(acao)} aria-label={`Editar ação ${acao.id}`}>
-                      <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
-                    </Button>
+                    <div className="flex items-center gap-0.5">
+                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEditAcao?.(acao)} aria-label={`Editar ação ${acao.id}`}>
+                        <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10" aria-label={`Excluir ação ${acao.id}`}>
+                            <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Excluir ação?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              A ação <strong>{acao.id} — {acao.titulo}</strong> e todas as suas subtarefas serão excluídas permanentemente.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            <AlertDialogAction
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              onClick={async () => {
+                                try {
+                                  await deleteAcao.mutateAsync(acao.id);
+                                  toast.success('Ação excluída!');
+                                } catch (e: any) {
+                                  toast.error(e.message || 'Erro ao excluir ação');
+                                }
+                              }}
+                            >
+                              Excluir
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </TableCell>
                 )}
               </TableRow>
