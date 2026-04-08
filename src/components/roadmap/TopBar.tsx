@@ -1,4 +1,4 @@
-import { Rocket, LayoutGrid, Table, LogOut, Users, User, Plus, GanttChart, ArrowLeft, Settings } from 'lucide-react';
+import { LayoutGrid, Table, LogOut, Users, User, Plus, GanttChart, ArrowLeft, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
@@ -56,9 +56,7 @@ const TopBar = ({ viewMode, onViewModeChange, onOpenAdmin, onCreateAcao, projeto
               Projetos
             </Button>
           )}
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-            <Rocket className="h-5 w-5 text-primary-foreground" aria-hidden="true" />
-          </div>
+          <img src="/logo.png" alt="Tour" className="h-10 w-10 rounded-lg object-cover" />
           <div>
             <h1 className="text-xl font-bold tracking-tight text-foreground">
               {projetoNome || 'Roadmap de Lançamento do TOUR'}

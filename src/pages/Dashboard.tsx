@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Rocket, Plus, LogOut, Users, User } from 'lucide-react';
+import { Plus, LogOut, Users, User } from 'lucide-react';
 import { useProjetos } from '@/hooks/useProjetos';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useAuth } from '@/hooks/useAuth';
@@ -58,9 +58,7 @@ const Dashboard = () => {
       <header className="border-b border-border bg-card px-4 py-4 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-              <Rocket className="h-5 w-5 text-primary-foreground" aria-hidden="true" />
-            </div>
+            <img src="/logo.png" alt="Tour" className="h-10 w-10 rounded-lg object-cover" />
             <div>
               <h1 className="text-xl font-bold tracking-tight text-foreground">
                 Tour Launch Hub
