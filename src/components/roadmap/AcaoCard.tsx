@@ -5,6 +5,7 @@ import { StatusBadge, PrioridadeBadge, SituacaoPrazoBadge } from './StatusBadge'
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useUpdateAcao } from '@/hooks/useAcoes';
 import { useUpdateSubtarefa, useCreateSubtarefa, useDeleteSubtarefa } from '@/hooks/useSubtarefas';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -93,9 +94,22 @@ const AcaoCard = ({ acao, allAcoes, onEdit }: AcaoCardProps) => {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-xs font-mono text-muted-foreground">{acao.id}</span>
-              <button onClick={cycleStatus} className={canEdit ? 'cursor-pointer hover:opacity-80' : ''} disabled={!canEdit}>
-                <StatusBadge status={acao.status} bloqueada={acao.bloqueada} />
-              </button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    onClick={cycleStatus}
+                    className={canEdit ? 'cursor-pointer hover:opacity-80' : ''}
+                    disabled={!canEdit}
+                    aria-label={`Status: ${acao.status}. ${canEdit ? 'Clique para alterar' : ''}`}
+                  >
+                    <StatusBadge status={acao.status} bloqueada={acao.bloqueada} />
+                  </button>
+                </TooltipTrigger>
+                {canEdit && (
+                  <TooltipContent>Clique para alterar status</TooltipContent>
+                )}
+              </Tooltip>
               <PrioridadeBadge prioridade={acao.prioridade} />
               <SituacaoPrazoBadge situacao={acao.situacaoPrazo} />
             </div>
@@ -107,21 +121,21 @@ const AcaoCard = ({ acao, allAcoes, onEdit }: AcaoCardProps) => {
             </p>
           </div>
           {canEdit && onEdit && (
-            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => onEdit(acao)}>
-              <Pencil className="h-4 w-4" />
+            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => onEdit(acao)} aria-label={`Editar ação ${acao.id}`}>
+              <Pencil className="h-4 w-4" aria-hidden="true" />
             </Button>
           )}
         </div>
 
         <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
           <span className="flex items-center gap-1">
-            <User className="h-3.5 w-3.5" /> {acao.responsavel}
+            <User className="h-3.5 w-3.5" aria-hidden="true" /> {acao.responsavel}
           </span>
           <span className="flex items-center gap-1">
-            <Calendar className="h-3.5 w-3.5" /> {new Date(acao.dataInicio).toLocaleDateString('pt-BR')} — {new Date(acao.dataFim).toLocaleDateString('pt-BR')}
+            <Calendar className="h-3.5 w-3.5" aria-hidden="true" /> {new Date(acao.dataInicio).toLocaleDateString('pt-BR')} — {new Date(acao.dataFim).toLocaleDateString('pt-BR')}
           </span>
           <span className="flex items-center gap-1">
-            <Clock className="h-3.5 w-3.5" /> {acao.tempoEstimado}
+            <Clock className="h-3.5 w-3.5" aria-hidden="true" /> {acao.tempoEstimado}
           </span>
         </div>
 
@@ -131,7 +145,7 @@ const AcaoCard = ({ acao, allAcoes, onEdit }: AcaoCardProps) => {
               ? 'bg-blocked/10 text-blocked'
               : 'bg-muted text-muted-foreground'
           }`}>
-            <Link className="h-3.5 w-3.5" />
+            <Link className="h-3.5 w-3.5" aria-hidden="true" />
             Depende de: <span className="font-medium">{depAcao.id} — {depAcao.titulo}</span>
             {acao.bloqueada && <span className="ml-1 font-semibold">(pendente)</span>}
           </div>
@@ -141,6 +155,7 @@ const AcaoCard = ({ acao, allAcoes, onEdit }: AcaoCardProps) => {
           <div className="flex items-center gap-3">
             {acao.subtarefas.length > 0 && (
               <button
+                type="button"
                 onClick={() => setExpanded(!expanded)}
                 className="flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
               >
@@ -153,6 +168,7 @@ const AcaoCard = ({ acao, allAcoes, onEdit }: AcaoCardProps) => {
             )}
             {canEdit && (
               <button
+                type="button"
                 onClick={() => { setExpanded(true); setShowAddSub(true); }}
                 className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary"
               >
@@ -179,7 +195,12 @@ const AcaoCard = ({ acao, allAcoes, onEdit }: AcaoCardProps) => {
               {sub.responsavel && <span className="text-muted-foreground hidden sm:inline">{sub.responsavel}</span>}
               {sub.tempoEstimado && <span className="text-muted-foreground">{sub.tempoEstimado}</span>}
               {role === 'admin' && (
-                <button onClick={() => handleDeleteSubtarefa(sub.id)} className="opacity-0 group-hover:opacity-100 text-destructive hover:text-destructive/80">
+                <button
+                  type="button"
+                  onClick={() => handleDeleteSubtarefa(sub.id)}
+                  className="sm:opacity-0 sm:group-hover:opacity-100 text-destructive hover:text-destructive/80 p-1"
+                  aria-label={`Excluir subtarefa: ${sub.titulo}`}
+                >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
               )}

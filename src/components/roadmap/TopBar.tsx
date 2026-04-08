@@ -1,4 +1,4 @@
-import { Rocket, LayoutGrid, Table, LogOut, Users, User, Plus } from 'lucide-react';
+import { Rocket, LayoutGrid, Table, LogOut, Users, User, Plus, GanttChart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,9 +12,11 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
+export type ViewMode = 'timeline' | 'cards' | 'tabela';
+
 interface TopBarProps {
-  viewMode: 'roadmap' | 'tabela';
-  onViewModeChange: (mode: 'roadmap' | 'tabela') => void;
+  viewMode: ViewMode;
+  onViewModeChange: (mode: ViewMode) => void;
   onOpenAdmin?: () => void;
   onCreateAcao?: () => void;
 }
@@ -39,7 +41,7 @@ const TopBar = ({ viewMode, onViewModeChange, onOpenAdmin, onCreateAcao }: TopBa
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-            <Rocket className="h-5 w-5 text-primary-foreground" />
+            <Rocket className="h-5 w-5 text-primary-foreground" aria-hidden="true" />
           </div>
           <div>
             <h1 className="text-xl font-bold tracking-tight text-foreground">
@@ -53,35 +55,50 @@ const TopBar = ({ viewMode, onViewModeChange, onOpenAdmin, onCreateAcao }: TopBa
         <div className="flex items-center gap-3">
           {canEdit && onCreateAcao && (
             <Button size="sm" onClick={onCreateAcao} className="gap-2">
-              <Plus className="h-4 w-4" />
+              <Plus className="h-4 w-4" aria-hidden="true" />
               Nova Ação
             </Button>
           )}
-          <div className="flex items-center gap-1 rounded-lg border border-border bg-muted p-1">
+          <div className="flex items-center gap-1 rounded-lg border border-border bg-muted p-1" role="tablist" aria-label="Modo de visualização">
             <Button
-              variant={viewMode === 'roadmap' ? 'default' : 'ghost'}
+              variant={viewMode === 'timeline' ? 'default' : 'ghost'}
               size="sm"
-              onClick={() => onViewModeChange('roadmap')}
+              onClick={() => onViewModeChange('timeline')}
               className="gap-2"
+              role="tab"
+              aria-selected={viewMode === 'timeline'}
             >
-              <LayoutGrid className="h-4 w-4" />
-              Roadmap
+              <GanttChart className="h-4 w-4" aria-hidden="true" />
+              <span className="hidden sm:inline">Timeline</span>
+            </Button>
+            <Button
+              variant={viewMode === 'cards' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => onViewModeChange('cards')}
+              className="gap-2"
+              role="tab"
+              aria-selected={viewMode === 'cards'}
+            >
+              <LayoutGrid className="h-4 w-4" aria-hidden="true" />
+              <span className="hidden sm:inline">Cards</span>
             </Button>
             <Button
               variant={viewMode === 'tabela' ? 'default' : 'ghost'}
               size="sm"
               onClick={() => onViewModeChange('tabela')}
               className="gap-2"
+              role="tab"
+              aria-selected={viewMode === 'tabela'}
             >
-              <Table className="h-4 w-4" />
-              Tabela
+              <Table className="h-4 w-4" aria-hidden="true" />
+              <span className="hidden sm:inline">Tabela</span>
             </Button>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="gap-2">
-                <User className="h-4 w-4" />
-                {profile?.nome || 'Usuário'}
+                <User className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">{profile?.nome || 'Usuário'}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -95,15 +112,13 @@ const TopBar = ({ viewMode, onViewModeChange, onOpenAdmin, onCreateAcao }: TopBa
               {role === 'admin' && onOpenAdmin && (
                 <>
                   <DropdownMenuItem onClick={onOpenAdmin} className="gap-2">
-                    <Users className="h-4 w-4" />
-                    Gerenciar Usuários
+                    <Users className="h-4 w-4" /> Gerenciar Usuários
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                 </>
               )}
               <DropdownMenuItem onClick={handleLogout} className="gap-2 text-destructive">
-                <LogOut className="h-4 w-4" />
-                Sair
+                <LogOut className="h-4 w-4" /> Sair
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

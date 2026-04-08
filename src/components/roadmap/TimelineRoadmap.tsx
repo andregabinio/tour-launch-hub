@@ -1,10 +1,10 @@
-import { useState, useMemo, useRef } from 'react';
-import { ChevronDown, ChevronUp, User, Clock, Link, Lock, AlertTriangle, Pencil } from 'lucide-react';
+import { useState, useMemo, useRef, useEffect } from 'react';
+import { ChevronDown, ChevronUp, User, Clock, Link, Lock, AlertTriangle, Pencil, X } from 'lucide-react';
 import { Acao, MacroEtapa } from '@/types/roadmap';
 import { StatusBadge, PrioridadeBadge, SituacaoPrazoBadge } from './StatusBadge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useUpdateSubtarefa } from '@/hooks/useSubtarefas';
 import { useUpdateAcao } from '@/hooks/useAcoes';
@@ -18,47 +18,59 @@ interface TimelineRoadmapProps {
 }
 
 const COLUMN_WIDTH = 120;
-const ROW_LABEL_WIDTH = 200;
-const CARD_HEIGHT = 52;
+const ROW_LABEL_WIDTH_LG = 200;
+const ROW_LABEL_WIDTH_SM = 120;
+const CARD_HEIGHT = 64;
 const ROW_PADDING = 12;
+
+function useRowLabelWidth() {
+  const [width, setWidth] = useState(
+    typeof window !== 'undefined' && window.innerWidth < 768 ? ROW_LABEL_WIDTH_SM : ROW_LABEL_WIDTH_LG
+  );
+  useEffect(() => {
+    const handler = () => setWidth(window.innerWidth < 768 ? ROW_LABEL_WIDTH_SM : ROW_LABEL_WIDTH_LG);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
+  return width;
+}
 
 function getWeekColumns(acoes: Acao[]): { label: string; start: Date; end: Date }[] {
   if (acoes.length === 0) return [];
-  
+
   let minDate = new Date(acoes[0].dataInicio);
   let maxDate = new Date(acoes[0].dataFim);
-  
+
   for (const a of acoes) {
     const s = new Date(a.dataInicio);
     const e = new Date(a.dataFim);
     if (s < minDate) minDate = s;
     if (e > maxDate) maxDate = e;
   }
-  
-  // Start from Monday of the min week
+
   const startDay = new Date(minDate);
   startDay.setDate(startDay.getDate() - ((startDay.getDay() + 6) % 7));
-  
+
   const cols: { label: string; start: Date; end: Date }[] = [];
   const cursor = new Date(startDay);
-  
+
   while (cursor <= maxDate) {
     const weekStart = new Date(cursor);
     const weekEnd = new Date(cursor);
     weekEnd.setDate(weekEnd.getDate() + 6);
-    
+
     const label = `${weekStart.getDate().toString().padStart(2, '0')}/${(weekStart.getMonth() + 1).toString().padStart(2, '0')}`;
     cols.push({ label, start: weekStart, end: weekEnd });
     cursor.setDate(cursor.getDate() + 7);
   }
-  
+
   return cols;
 }
 
 function getMonthHeaders(columns: { label: string; start: Date; end: Date }[]): { label: string; span: number }[] {
   const months: { label: string; span: number }[] = [];
   const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-  
+
   for (const col of columns) {
     const monthLabel = `${monthNames[col.start.getMonth()]} ${col.start.getFullYear()}`;
     if (months.length > 0 && months[months.length - 1].label === monthLabel) {
@@ -84,7 +96,6 @@ const AcaoDetail = ({ acao, allAcoes, onClose, onEdit }: { acao: Acao; allAcoes:
     const next = acao.status === 'não iniciada' ? 'em andamento' : acao.status === 'em andamento' ? 'concluída' : 'não iniciada';
     try {
       await updateAcao.mutateAsync({ id: acao.id, status: next });
-      onClose();
     } catch (e: any) {
       toast.error(e.message || 'Erro ao atualizar status');
     }
@@ -105,18 +116,33 @@ const AcaoDetail = ({ acao, allAcoes, onClose, onEdit }: { acao: Acao; allAcoes:
       <div
         className="relative w-full max-w-lg mx-4 bg-card border border-border rounded-xl shadow-xl overflow-hidden"
         onClick={e => e.stopPropagation()}
+        role="dialog"
+        aria-label={`Detalhes da ação: ${acao.titulo}`}
       >
         <div className="p-5 space-y-4">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs font-mono text-muted-foreground">{acao.id}</span>
-            <button onClick={cycleStatus} className={canEdit ? 'cursor-pointer hover:opacity-80' : ''} disabled={!canEdit}>
-              <StatusBadge status={acao.status} bloqueada={acao.bloqueada} />
-            </button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={cycleStatus}
+                  className={canEdit ? 'cursor-pointer hover:opacity-80' : ''}
+                  disabled={!canEdit}
+                  aria-label={`Status: ${acao.status}. ${canEdit ? 'Clique para alterar' : ''}`}
+                >
+                  <StatusBadge status={acao.status} bloqueada={acao.bloqueada} />
+                </button>
+              </TooltipTrigger>
+              {canEdit && (
+                <TooltipContent>Clique para alterar status</TooltipContent>
+              )}
+            </Tooltip>
             <PrioridadeBadge prioridade={acao.prioridade} />
             <SituacaoPrazoBadge situacao={acao.situacaoPrazo} />
             {canEdit && onEdit && (
-              <Button variant="ghost" size="sm" className="ml-auto h-7 gap-1.5 text-xs" onClick={() => { onEdit(acao); onClose(); }}>
-                <Pencil className="h-3.5 w-3.5" /> Editar
+              <Button variant="ghost" size="sm" className="ml-auto h-7 gap-1.5 text-xs" onClick={() => { onEdit(acao); onClose(); }} aria-label="Editar ação">
+                <Pencil className="h-3.5 w-3.5" aria-hidden="true" /> Editar
               </Button>
             )}
           </div>
@@ -124,8 +150,8 @@ const AcaoDetail = ({ acao, allAcoes, onClose, onEdit }: { acao: Acao; allAcoes:
           <p className="text-sm text-muted-foreground">{acao.descricao}</p>
 
           <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1"><User className="h-3.5 w-3.5" /> {acao.responsavel}</span>
-            <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {acao.tempoEstimado}</span>
+            <span className="flex items-center gap-1"><User className="h-3.5 w-3.5" aria-hidden="true" /> {acao.responsavel}</span>
+            <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" aria-hidden="true" /> {acao.tempoEstimado}</span>
             <span>{new Date(acao.dataInicio).toLocaleDateString('pt-BR')} — {new Date(acao.dataFim).toLocaleDateString('pt-BR')}</span>
           </div>
 
@@ -133,7 +159,7 @@ const AcaoDetail = ({ acao, allAcoes, onClose, onEdit }: { acao: Acao; allAcoes:
             <div className={`flex items-center gap-1.5 text-xs rounded-md px-2.5 py-1.5 ${
               acao.bloqueada ? 'bg-blocked/10 text-blocked' : 'bg-muted text-muted-foreground'
             }`}>
-              <Link className="h-3.5 w-3.5" />
+              <Link className="h-3.5 w-3.5" aria-hidden="true" />
               Depende de: <span className="font-medium">{depAcao.id} — {depAcao.titulo}</span>
               {acao.bloqueada && <span className="ml-1 font-semibold">(pendente)</span>}
             </div>
@@ -142,6 +168,7 @@ const AcaoDetail = ({ acao, allAcoes, onClose, onEdit }: { acao: Acao; allAcoes:
           {acao.subtarefas.length > 0 && (
             <>
               <button
+                type="button"
                 onClick={() => setShowSubs(!showSubs)}
                 className="flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
               >
@@ -174,10 +201,12 @@ const AcaoDetail = ({ acao, allAcoes, onClose, onEdit }: { acao: Acao; allAcoes:
           )}
         </div>
         <button
+          type="button"
           onClick={onClose}
-          className="absolute top-3 right-3 text-muted-foreground hover:text-foreground text-lg leading-none"
+          className="absolute top-3 right-3 flex items-center justify-center h-8 w-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          aria-label="Fechar detalhes"
         >
-          ×
+          <X className="h-4 w-4" />
         </button>
       </div>
     </div>
@@ -187,6 +216,7 @@ const AcaoDetail = ({ acao, allAcoes, onClose, onEdit }: { acao: Acao; allAcoes:
 const TimelineRoadmap = ({ acoes, allAcoes, macroEtapas, onEditAcao }: TimelineRoadmapProps) => {
   const [selectedAcao, setSelectedAcao] = useState<Acao | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const rowLabelWidth = useRowLabelWidth();
 
   const columns = useMemo(() => getWeekColumns(allAcoes), [allAcoes]);
   const monthHeaders = useMemo(() => getMonthHeaders(columns), [columns]);
@@ -210,18 +240,27 @@ const TimelineRoadmap = ({ acoes, allAcoes, macroEtapas, onEditAcao }: TimelineR
     return Math.max(100, (days / totalDays) * totalWidth);
   };
 
+  // Scroll to today on mount
+  useEffect(() => {
+    if (scrollRef.current && columns.length > 0) {
+      const today = new Date();
+      const todayPos = getPosition(today.toISOString().split('T')[0]);
+      const containerWidth = scrollRef.current.clientWidth;
+      scrollRef.current.scrollLeft = Math.max(0, todayPos - containerWidth / 3);
+    }
+  }, [columns.length]);
+
   // Group actions by macro etapa and stack overlapping ones
   const etapasWithAcoes = useMemo(() => {
     return macroEtapas.map(etapa => {
       const etapaAcoes = acoes.filter(a => a.macroEtapa === etapa.titulo);
-      
-      // Simple row stacking to avoid overlap
+
       const rows: Acao[][] = [];
       for (const acao of etapaAcoes.sort((a, b) => new Date(a.dataInicio).getTime() - new Date(b.dataInicio).getTime())) {
         let placed = false;
         for (const row of rows) {
           const lastInRow = row[row.length - 1];
-          if (new Date(acao.dataInicio) >= new Date(lastInRow.dataFim)) {
+          if (new Date(acao.dataInicio) > new Date(lastInRow.dataFim)) {
             row.push(acao);
             placed = true;
             break;
@@ -229,15 +268,18 @@ const TimelineRoadmap = ({ acoes, allAcoes, macroEtapas, onEditAcao }: TimelineR
         }
         if (!placed) rows.push([acao]);
       }
-      
+
       return { etapa, acoes: etapaAcoes, rows };
     }).filter(e => e.acoes.length > 0);
-  }, [acoes]);
+  }, [acoes, macroEtapas]);
 
-  // Check if current date is in a column
+  // Today line position
   const today = new Date();
   const todayOffset = getPosition(today.toISOString().split('T')[0]);
   const isTodayVisible = todayOffset >= 0 && todayOffset <= totalWidth;
+
+  // Find which column contains today
+  const todayColIndex = columns.findIndex(col => today >= col.start && today <= col.end);
 
   if (acoes.length === 0) {
     return (
@@ -253,7 +295,7 @@ const TimelineRoadmap = ({ acoes, allAcoes, macroEtapas, onEditAcao }: TimelineR
       <div className="glass-card rounded-xl overflow-hidden">
         <div className="flex">
           {/* Left: Macro etapa labels */}
-          <div className="shrink-0 border-r border-border bg-card z-10" style={{ width: ROW_LABEL_WIDTH }}>
+          <div className="shrink-0 border-r border-border bg-card z-10" style={{ width: rowLabelWidth }}>
             {/* Month header spacer */}
             <div className="h-8 border-b border-border" />
             {/* Week header spacer */}
@@ -268,9 +310,9 @@ const TimelineRoadmap = ({ acoes, allAcoes, macroEtapas, onEditAcao }: TimelineR
                 <div className="p-3 w-full">
                   <div className="flex items-center gap-2">
                     <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: etapa.cor }} />
-                    <span className="text-xs font-semibold text-foreground leading-tight">{etapa.titulo}</span>
+                    <span className="text-xs font-semibold text-foreground leading-tight truncate">{etapa.titulo}</span>
                   </div>
-                  {etapa.descricao && (
+                  {etapa.descricao && rowLabelWidth > ROW_LABEL_WIDTH_SM && (
                     <p className="text-[10px] text-muted-foreground mt-1 leading-tight pl-[18px]">{etapa.descricao}</p>
                   )}
                 </div>
@@ -282,7 +324,7 @@ const TimelineRoadmap = ({ acoes, allAcoes, macroEtapas, onEditAcao }: TimelineR
           <div className="flex-1 overflow-x-auto" ref={scrollRef}>
             <div style={{ minWidth: totalWidth }}>
               {/* Month headers */}
-              <div className="flex h-8 border-b border-border bg-muted/40">
+              <div className="flex h-8 border-b border-border bg-muted/40 sticky top-0 z-[5]">
                 {monthHeaders.map((m, i) => (
                   <div
                     key={i}
@@ -295,16 +337,21 @@ const TimelineRoadmap = ({ acoes, allAcoes, macroEtapas, onEditAcao }: TimelineR
               </div>
 
               {/* Week headers */}
-              <div className="flex h-10 border-b border-border bg-muted/20">
-                {columns.map((col, i) => (
-                  <div
-                    key={i}
-                    className="text-[10px] font-medium text-muted-foreground flex items-center justify-center border-r border-border/50"
-                    style={{ width: COLUMN_WIDTH }}
-                  >
-                    Sem {col.label}
-                  </div>
-                ))}
+              <div className="flex h-10 border-b border-border bg-muted/20 sticky top-8 z-[5]">
+                {columns.map((col, i) => {
+                  const isToday = i === todayColIndex;
+                  return (
+                    <div
+                      key={i}
+                      className={`text-[11px] font-medium flex items-center justify-center border-r border-border/50 ${
+                        isToday ? 'text-primary font-semibold bg-primary/5' : 'text-muted-foreground'
+                      }`}
+                      style={{ width: COLUMN_WIDTH }}
+                    >
+                      {isToday ? '● Hoje' : `Sem ${col.label}`}
+                    </div>
+                  );
+                })}
               </div>
 
               {/* Swimlane rows */}
@@ -330,7 +377,7 @@ const TimelineRoadmap = ({ acoes, allAcoes, macroEtapas, onEditAcao }: TimelineR
                     {/* Today marker */}
                     {isTodayVisible && (
                       <div
-                        className="absolute top-0 bottom-0 w-px bg-primary/40 z-[1]"
+                        className="absolute top-0 bottom-0 w-0.5 bg-primary/60 z-[2]"
                         style={{ left: todayOffset }}
                       />
                     )}
@@ -355,38 +402,54 @@ const TimelineRoadmap = ({ acoes, allAcoes, macroEtapas, onEditAcao }: TimelineR
                         else if (isAlta) { borderColor = 'border-warning/40'; }
 
                         return (
-                          <div
+                          <button
+                            type="button"
                             key={acao.id}
                             className={`absolute rounded-lg border ${borderColor} ${cardBg} shadow-sm cursor-pointer
-                              hover:shadow-md hover:z-10 transition-shadow duration-150
+                              hover:shadow-md hover:z-10 transition-shadow duration-150 text-left
+                              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary
                               ${isBlocked ? 'opacity-70' : ''}`}
                             style={{ left, top, width: Math.max(width, 100), height: CARD_HEIGHT }}
                             onClick={() => setSelectedAcao(acao)}
+                            aria-label={`${acao.titulo} — ${acao.status}, ${acao.prioridade} prioridade`}
                           >
-                            <div className="px-2.5 py-1.5 h-full flex flex-col justify-center overflow-hidden">
+                            <div className="px-2.5 py-2 h-full flex flex-col justify-center overflow-hidden">
                               <div className="flex items-center gap-1.5">
-                                {isBlocked && <Lock className="h-3 w-3 text-blocked shrink-0" />}
-                                {isAtrasada && !isBlocked && <AlertTriangle className="h-3 w-3 text-destructive shrink-0" />}
-                                <span className="text-[11px] font-semibold text-foreground truncate leading-tight">
+                                {isBlocked && <Lock className="h-3 w-3 text-blocked shrink-0" aria-hidden="true" />}
+                                {isAtrasada && !isBlocked && <AlertTriangle className="h-3 w-3 text-destructive shrink-0" aria-hidden="true" />}
+                                <span className="text-[12px] font-semibold text-foreground truncate leading-tight">
                                   {acao.titulo}
                                 </span>
                               </div>
-                              <div className="flex items-center gap-2 mt-0.5">
-                                <span className="text-[9px] text-muted-foreground truncate">{acao.responsavel}</span>
-                                <span className={`text-[9px] font-medium ${
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-[10px] text-muted-foreground truncate">{acao.responsavel}</span>
+                                <span className={`text-[10px] font-medium ${
                                   isAlta ? 'text-destructive' : isAtrasada ? 'text-destructive' : 'text-muted-foreground'
                                 }`}>
                                   {acao.prioridade === 'alta' ? '● Alta' : acao.prioridade === 'média' ? '● Média' : '● Baixa'}
                                 </span>
-                                {isConcluida && <span className="text-[9px] text-success font-medium">✓</span>}
+                                {isConcluida && <span className="text-[10px] text-success font-medium">✓</span>}
                               </div>
+                              {acao.subtarefas.length > 0 && (
+                                <div className="flex items-center gap-1 mt-0.5">
+                                  <div className="flex-1 h-1 rounded-full bg-muted overflow-hidden max-w-[60px]">
+                                    <div
+                                      className="h-full rounded-full bg-primary/60"
+                                      style={{ width: `${(acao.subtarefas.filter(s => s.status === 'concluída').length / acao.subtarefas.length) * 100}%` }}
+                                    />
+                                  </div>
+                                  <span className="text-[9px] text-muted-foreground">
+                                    {acao.subtarefas.filter(s => s.status === 'concluída').length}/{acao.subtarefas.length}
+                                  </span>
+                                </div>
+                              )}
                             </div>
                             {/* Left accent bar */}
                             <div
                               className="absolute left-0 top-0 bottom-0 w-1 rounded-l-lg"
                               style={{ backgroundColor: etapa.cor }}
                             />
-                          </div>
+                          </button>
                         );
                       })
                     )}

@@ -31,23 +31,26 @@ const SummaryCards = ({ acoes, activeCard, onCardClick }: SummaryCardsProps) => 
       {cards.map((card) => {
         const isActive = activeCard === card.filterKey;
         return (
-          <div
+          <button
             key={card.label}
+            type="button"
             onClick={() => onCardClick?.(card.filterKey)}
-            className={`glass-card rounded-lg p-4 cursor-pointer transition-all hover:scale-[1.03] hover:shadow-md ${
+            aria-pressed={isActive}
+            aria-label={`${card.label}: ${card.value}. ${isActive ? 'Filtro ativo' : 'Clique para filtrar'}`}
+            className={`glass-card rounded-lg p-4 cursor-pointer transition-all hover:scale-[1.03] active:scale-[0.97] hover:shadow-md text-left w-full ${
               isActive ? 'ring-2 ring-primary shadow-md' : ''
             }`}
           >
             <div className="flex items-center gap-3">
               <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${card.bg}`}>
-                <card.icon className={`h-5 w-5 ${card.color}`} />
+                <card.icon className={`h-5 w-5 ${card.color}`} aria-hidden="true" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-foreground">{card.value}</p>
-                <p className="text-[10px] text-muted-foreground leading-tight">{card.label}</p>
+                <p className="text-xs text-muted-foreground leading-tight">{card.label}</p>
               </div>
             </div>
-          </div>
+          </button>
         );
       })}
     </div>
