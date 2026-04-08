@@ -214,7 +214,8 @@ const AcaoDetail = ({ acao, allAcoes, onClose, onEdit }: { acao: Acao; allAcoes:
 };
 
 const TimelineRoadmap = ({ acoes, allAcoes, macroEtapas, onEditAcao }: TimelineRoadmapProps) => {
-  const [selectedAcao, setSelectedAcao] = useState<Acao | null>(null);
+  const [selectedAcaoId, setSelectedAcaoId] = useState<string | null>(null);
+  const selectedAcao = selectedAcaoId ? allAcoes.find(a => a.id === selectedAcaoId) ?? null : null;
   const scrollRef = useRef<HTMLDivElement>(null);
   const rowLabelWidth = useRowLabelWidth();
 
@@ -410,7 +411,7 @@ const TimelineRoadmap = ({ acoes, allAcoes, macroEtapas, onEditAcao }: TimelineR
                               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary
                               ${isBlocked ? 'opacity-70' : ''}`}
                             style={{ left, top, width: Math.max(width, 100), height: CARD_HEIGHT }}
-                            onClick={() => setSelectedAcao(acao)}
+                            onClick={() => setSelectedAcaoId(acao.id)}
                             aria-label={`${acao.titulo} — ${acao.status}, ${acao.prioridade} prioridade`}
                           >
                             <div className="px-2.5 py-2 h-full flex flex-col justify-center overflow-hidden">
@@ -463,7 +464,7 @@ const TimelineRoadmap = ({ acoes, allAcoes, macroEtapas, onEditAcao }: TimelineR
 
       {/* Detail overlay */}
       {selectedAcao && (
-        <AcaoDetail acao={selectedAcao} allAcoes={allAcoes} onClose={() => setSelectedAcao(null)} onEdit={onEditAcao} />
+        <AcaoDetail acao={selectedAcao} allAcoes={allAcoes} onClose={() => setSelectedAcaoId(null)} onEdit={onEditAcao} />
       )}
     </>
   );
