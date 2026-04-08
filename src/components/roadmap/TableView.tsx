@@ -1,5 +1,8 @@
 import { Acao } from '@/types/roadmap';
 import { StatusBadge, PrioridadeBadge, SituacaoPrazoBadge } from './StatusBadge';
+import { Button } from '@/components/ui/button';
+import { Pencil } from 'lucide-react';
+import { useAuthContext } from '@/contexts/AuthContext';
 import {
   Table,
   TableBody,
@@ -11,9 +14,13 @@ import {
 
 interface TableViewProps {
   acoes: Acao[];
+  onEditAcao?: (acao: Acao) => void;
 }
 
-const TableView = ({ acoes }: TableViewProps) => {
+const TableView = ({ acoes, onEditAcao }: TableViewProps) => {
+  const { role } = useAuthContext();
+  const canEdit = role === 'admin' || role === 'editor';
+
   if (acoes.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
@@ -42,6 +49,7 @@ const TableView = ({ acoes }: TableViewProps) => {
               <TableHead>Dependência</TableHead>
               <TableHead className="text-center">Subtarefas</TableHead>
               <TableHead>Bloqueada</TableHead>
+              {canEdit && <TableHead className="w-[50px]"></TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -85,6 +93,13 @@ const TableView = ({ acoes }: TableViewProps) => {
                 <TableCell className="text-xs">
                   {acao.bloqueada ? <span className="text-blocked font-medium">Sim</span> : '—'}
                 </TableCell>
+                {canEdit && (
+                  <TableCell>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEditAcao?.(acao)}>
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>

@@ -8,6 +8,7 @@ import Filters, { FilterState, defaultFilters } from '@/components/roadmap/Filte
 import TimelineRoadmap from '@/components/roadmap/TimelineRoadmap';
 import TableView from '@/components/roadmap/TableView';
 import UserManagement from '@/components/admin/UserManagement';
+import AcaoEditDialog from '@/components/roadmap/AcaoEditDialog';
 
 const prioridadeOrder = { alta: 0, média: 1, baixa: 2 };
 
@@ -15,6 +16,8 @@ const Index = () => {
   const [viewMode, setViewMode] = useState<'roadmap' | 'tabela'>('roadmap');
   const [filters, setFilters] = useState<FilterState>(defaultFilters);
   const [showAdmin, setShowAdmin] = useState(false);
+  const [editingAcao, setEditingAcao] = useState<Acao | null>(null);
+  const [showCreateAcao, setShowCreateAcao] = useState(false);
   const { data: acoes = [], isLoading, error } = useAcoes();
   const { data: macroEtapas = [] } = useMacroEtapas();
 
@@ -92,17 +95,38 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <TopBar viewMode={viewMode} onViewModeChange={setViewMode} onOpenAdmin={() => setShowAdmin(true)} />
+      <TopBar
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        onOpenAdmin={() => setShowAdmin(true)}
+        onCreateAcao={() => setShowCreateAcao(true)}
+      />
       <main className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8 space-y-6">
         <SummaryCards acoes={processedAcoes} />
         <Filters filters={filters} onChange={setFilters} acoes={processedAcoes} />
         {viewMode === 'roadmap' ? (
-          <TimelineRoadmap acoes={filteredAcoes} allAcoes={processedAcoes} macroEtapas={macroEtapas} />
+          <TimelineRoadmap
+            acoes={filteredAcoes}
+            allAcoes={processedAcoes}
+            macroEtapas={macroEtapas}
+            onEditAcao={setEditingAcao}
+          />
         ) : (
-          <TableView acoes={filteredAcoes} />
+          <TableView acoes={filteredAcoes} onEditAcao={setEditingAcao} />
         )}
       </main>
       <UserManagement open={showAdmin} onOpenChange={setShowAdmin} />
+      <AcaoEditDialog
+        open={!!editingAcao}
+        onOpenChange={(open) => { if (!open) setEditingAcao(null); }}
+        acao={editingAcao}
+        allAcoes={processedAcoes}
+      />
+      <AcaoEditDialog
+        open={showCreateAcao}
+        onOpenChange={setShowCreateAcao}
+        allAcoes={processedAcoes}
+      />
     </div>
   );
 };
