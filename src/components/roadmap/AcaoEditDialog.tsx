@@ -15,11 +15,12 @@ interface AcaoEditDialogProps {
   onOpenChange: (open: boolean) => void;
   acao?: Acao | null;
   allAcoes?: Acao[];
+  projetoId?: string;
 }
 
-const AcaoEditDialog = ({ open, onOpenChange, acao, allAcoes = [] }: AcaoEditDialogProps) => {
+const AcaoEditDialog = ({ open, onOpenChange, acao, allAcoes = [], projetoId }: AcaoEditDialogProps) => {
   const isEdit = !!acao;
-  const { data: macroEtapas = [] } = useMacroEtapas();
+  const { data: macroEtapas = [] } = useMacroEtapas(projetoId);
   const createAcao = useCreateAcao();
   const updateAcao = useUpdateAcao();
 

@@ -1,4 +1,4 @@
-import { Rocket, LayoutGrid, Table, LogOut, Users, User, Plus, GanttChart } from 'lucide-react';
+import { Rocket, LayoutGrid, Table, LogOut, Users, User, Plus, GanttChart, ArrowLeft, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,9 +19,13 @@ interface TopBarProps {
   onViewModeChange: (mode: ViewMode) => void;
   onOpenAdmin?: () => void;
   onCreateAcao?: () => void;
+  projetoNome?: string;
+  onManageEtapas?: () => void;
+  onSaveAsTemplate?: () => void;
+  onArchiveProjeto?: () => void;
 }
 
-const TopBar = ({ viewMode, onViewModeChange, onOpenAdmin, onCreateAcao }: TopBarProps) => {
+const TopBar = ({ viewMode, onViewModeChange, onOpenAdmin, onCreateAcao, projetoNome, onManageEtapas, onSaveAsTemplate, onArchiveProjeto }: TopBarProps) => {
   const { profile, role } = useAuthContext();
   const { signOut } = useAuth();
   const navigate = useNavigate();
@@ -40,12 +44,24 @@ const TopBar = ({ viewMode, onViewModeChange, onOpenAdmin, onCreateAcao }: TopBa
     <header className="border-b border-border bg-card px-4 py-4 sm:px-6 lg:px-8">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
+          {projetoNome && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/')}
+              className="gap-1"
+              aria-label="Voltar para projetos"
+            >
+              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+              Projetos
+            </Button>
+          )}
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
             <Rocket className="h-5 w-5 text-primary-foreground" aria-hidden="true" />
           </div>
           <div>
             <h1 className="text-xl font-bold tracking-tight text-foreground">
-              Roadmap de Lançamento do TOUR
+              {projetoNome || 'Roadmap de Lançamento do TOUR'}
             </h1>
             <p className="text-sm text-muted-foreground">
               Planejamento e acompanhamento estratégico
@@ -94,6 +110,35 @@ const TopBar = ({ viewMode, onViewModeChange, onOpenAdmin, onCreateAcao }: TopBa
               <span className="hidden sm:inline">Tabela</span>
             </Button>
           </div>
+          {role === 'admin' && projetoNome && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2" aria-label="Configurações do projeto">
+                  <Settings className="h-4 w-4" aria-hidden="true" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {onManageEtapas && (
+                  <DropdownMenuItem onClick={onManageEtapas} className="gap-2">
+                    Gerenciar Macro Etapas
+                  </DropdownMenuItem>
+                )}
+                {onSaveAsTemplate && (
+                  <DropdownMenuItem onClick={onSaveAsTemplate} className="gap-2">
+                    Salvar como Modelo
+                  </DropdownMenuItem>
+                )}
+                {onArchiveProjeto && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={onArchiveProjeto} className="gap-2 text-destructive">
+                      Arquivar Projeto
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="gap-2">
