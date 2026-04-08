@@ -14,13 +14,186 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      acoes: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          data_fim: string
+          data_inicio: string
+          dependencia_de: string | null
+          descricao: string
+          id: string
+          macro_etapa_id: string
+          prioridade: string
+          responsavel: string | null
+          situacao_prazo: string
+          status: string
+          tempo_estimado: string | null
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          data_fim: string
+          data_inicio: string
+          dependencia_de?: string | null
+          descricao?: string
+          id: string
+          macro_etapa_id: string
+          prioridade?: string
+          responsavel?: string | null
+          situacao_prazo?: string
+          status?: string
+          tempo_estimado?: string | null
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          data_fim?: string
+          data_inicio?: string
+          dependencia_de?: string | null
+          descricao?: string
+          id?: string
+          macro_etapa_id?: string
+          prioridade?: string
+          responsavel?: string | null
+          situacao_prazo?: string
+          status?: string
+          tempo_estimado?: string | null
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "acoes_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "acoes_dependencia_de_fkey"
+            columns: ["dependencia_de"]
+            isOneToOne: false
+            referencedRelation: "acoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "acoes_macro_etapa_id_fkey"
+            columns: ["macro_etapa_id"]
+            isOneToOne: false
+            referencedRelation: "macro_etapas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      macro_etapas: {
+        Row: {
+          cor: string
+          cor_bg: string
+          cor_border: string
+          descricao: string | null
+          id: string
+          nome: string
+          ordem: number
+        }
+        Insert: {
+          cor?: string
+          cor_bg?: string
+          cor_border?: string
+          descricao?: string | null
+          id: string
+          nome: string
+          ordem?: number
+        }
+        Update: {
+          cor?: string
+          cor_bg?: string
+          cor_border?: string
+          descricao?: string | null
+          id?: string
+          nome?: string
+          ordem?: number
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          nome: string
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string
+          id: string
+          nome?: string
+          role?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          nome?: string
+          role?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      subtarefas: {
+        Row: {
+          acao_id: string
+          created_at: string
+          id: string
+          responsavel: string | null
+          status: string
+          tempo_estimado: string | null
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          acao_id: string
+          created_at?: string
+          id?: string
+          responsavel?: string | null
+          status?: string
+          tempo_estimado?: string | null
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          acao_id?: string
+          created_at?: string
+          id?: string
+          responsavel?: string | null
+          status?: string
+          tempo_estimado?: string | null
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subtarefas_acao_id_fkey"
+            columns: ["acao_id"]
+            isOneToOne: false
+            referencedRelation: "acoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_role: { Args: never; Returns: string }
     }
     Enums: {
       [_ in never]: never
