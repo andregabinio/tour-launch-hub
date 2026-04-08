@@ -1,4 +1,4 @@
-import { Rocket, LayoutGrid, Table, LogOut, Users, User } from 'lucide-react';
+import { Rocket, LayoutGrid, Table, LogOut, Users, User, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,12 +16,14 @@ interface TopBarProps {
   viewMode: 'roadmap' | 'tabela';
   onViewModeChange: (mode: 'roadmap' | 'tabela') => void;
   onOpenAdmin?: () => void;
+  onCreateAcao?: () => void;
 }
 
-const TopBar = ({ viewMode, onViewModeChange, onOpenAdmin }: TopBarProps) => {
+const TopBar = ({ viewMode, onViewModeChange, onOpenAdmin, onCreateAcao }: TopBarProps) => {
   const { profile, role } = useAuthContext();
   const { signOut } = useAuth();
   const navigate = useNavigate();
+  const canEdit = role === 'admin' || role === 'editor';
 
   const handleLogout = async () => {
     try {
@@ -49,6 +51,12 @@ const TopBar = ({ viewMode, onViewModeChange, onOpenAdmin }: TopBarProps) => {
           </div>
         </div>
         <div className="flex items-center gap-3">
+          {canEdit && onCreateAcao && (
+            <Button size="sm" onClick={onCreateAcao} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Nova Ação
+            </Button>
+          )}
           <div className="flex items-center gap-1 rounded-lg border border-border bg-muted p-1">
             <Button
               variant={viewMode === 'roadmap' ? 'default' : 'ghost'}
