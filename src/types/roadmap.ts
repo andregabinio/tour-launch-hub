@@ -34,6 +34,7 @@ export interface MacroEtapa {
   cor: string;
   corBg: string;
   corBorder: string;
+  projetoId: string;
 }
 
 export type UserRole = 'admin' | 'editor' | 'viewer';

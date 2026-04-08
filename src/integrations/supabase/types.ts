@@ -99,6 +99,7 @@ export type Database = {
           id: string
           nome: string
           ordem: number
+          projeto_id: string
         }
         Insert: {
           cor?: string
@@ -108,6 +109,7 @@ export type Database = {
           id: string
           nome: string
           ordem?: number
+          projeto_id?: string
         }
         Update: {
           cor?: string
@@ -117,8 +119,17 @@ export type Database = {
           id?: string
           nome?: string
           ordem?: number
+          projeto_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "macro_etapas_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "projetos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -146,6 +157,85 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      projetos: {
+        Row: {
+          cor: string
+          created_at: string
+          created_by: string | null
+          descricao: string
+          id: string
+          nome: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          cor?: string
+          created_at?: string
+          created_by?: string | null
+          descricao?: string
+          id: string
+          nome: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          cor?: string
+          created_at?: string
+          created_by?: string | null
+          descricao?: string
+          id?: string
+          nome?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projetos_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      templates: {
+        Row: {
+          conteudo: Json
+          created_at: string
+          created_by: string | null
+          descricao: string
+          id: string
+          nome: string
+          updated_at: string
+        }
+        Insert: {
+          conteudo?: Json
+          created_at?: string
+          created_by?: string | null
+          descricao?: string
+          id: string
+          nome: string
+          updated_at?: string
+        }
+        Update: {
+          conteudo?: Json
+          created_at?: string
+          created_by?: string | null
+          descricao?: string
+          id?: string
+          nome?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "templates_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subtarefas: {
         Row: {

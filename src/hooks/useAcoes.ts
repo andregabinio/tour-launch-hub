@@ -16,7 +16,7 @@ interface AcaoRow {
   data_fim: string;
   dependencia_de: string | null;
   created_by: string | null;
-  macro_etapas: { nome: string } | null;
+  macro_etapas: { nome: string; projeto_id: string } | null;
   subtarefas: {
     id: string;
     titulo: string;
@@ -50,18 +50,21 @@ function rowToAcao(row: AcaoRow): Acao {
   };
 }
 
-export function useAcoes() {
+export function useAcoes(projetoId?: string) {
   return useQuery({
-    queryKey: ['acoes'],
+    queryKey: ['acoes', projetoId],
     queryFn: async (): Promise<Acao[]> => {
       const { data, error } = await supabase
         .from('acoes')
-        .select('*, macro_etapas(nome), subtarefas(*)')
+        .select('*, macro_etapas(nome, projeto_id), subtarefas(*)')
         .order('data_inicio');
 
       if (error) throw error;
-      return (data ?? []).map(rowToAcao);
+      return (data ?? [])
+        .filter((row) => row.macro_etapas?.projeto_id === projetoId)
+        .map(rowToAcao);
     },
+    enabled: !!projetoId,
   });
 }
 
