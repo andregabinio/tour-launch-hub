@@ -241,7 +241,10 @@ export function useCsvImport() {
     setImportResult(null);
   }, []);
 
-  const importToProject = useCallback(async (projetoId: string) => {
+  const importToProject = useCallback(async (
+    projetoId: string | null,
+    newProjectName?: string,
+  ) => {
     if (!parsedData || errors.length > 0) return;
     setIsImporting(true);
 
@@ -249,13 +252,29 @@ export function useCsvImport() {
     let macroEtapasCreated = 0;
     let acoesCreated = 0;
     let subtarefasCreated = 0;
+    let createdProjetoId = projetoId;
 
     try {
+      // 0. Create project if needed (Dashboard mode)
+      if (!createdProjetoId && newProjectName) {
+        const id = crypto.randomUUID();
+        const { error } = await supabase.from('projetos').insert({
+          id,
+          nome: newProjectName,
+          descricao: 'Projeto importado via CSV',
+          status: 'ativo',
+          cor: '#3B82F6',
+        });
+        if (error) throw new Error(`Erro ao criar projeto: ${error.message}`);
+        createdProjetoId = id;
+      }
+
+      if (!createdProjetoId) throw new Error('ID do projeto não disponível');
       // 1. Fetch existing macro etapas for the project
       const { data: existingME } = await supabase
         .from('macro_etapas')
         .select('id, nome, ordem')
-        .eq('projeto_id', projetoId)
+        .eq('projeto_id', createdProjetoId)
         .order('ordem');
 
       const meMap = new Map<string, string>(); // lowercase name → id
@@ -287,24 +306,22 @@ export function useCsvImport() {
           cor_bg: '',
           cor_border: '',
           ordem: nextOrdem + i,
-          projeto_id: projetoId,
+          projeto_id: createdProjetoId,
         });
         if (error) throw new Error(`Erro ao criar macro etapa '${nome}': ${error.message}`);
         meMap.set(nome.toLowerCase(), id);
         macroEtapasCreated++;
       }
 
-      // 4. Fetch existing acoes for dependency resolution
+      // 4. Fetch existing acoes for dependency resolution (filtered by project)
       const { data: existingAcoes } = await supabase
         .from('acoes')
-        .select('id, titulo, macro_etapa_id, macro_etapas(projeto_id)')
-        .order('data_inicio');
+        .select('id, titulo, macro_etapas!inner(projeto_id)')
+        .eq('macro_etapas.projeto_id', createdProjetoId);
 
       const existingTitleMap = new Map<string, string>(); // lowercase title → id
       for (const a of existingAcoes ?? []) {
-        if ((a.macro_etapas as any)?.projeto_id === projetoId) {
-          existingTitleMap.set(a.titulo.toLowerCase(), a.id);
-        }
+        existingTitleMap.set(a.titulo.toLowerCase(), a.id);
       }
 
       // 5. Pre-generate IDs for all CSV ações and build title→id map
@@ -372,7 +389,11 @@ export function useCsvImport() {
             responsavel: null,
             tempo_estimado: null,
           });
-          if (!subError) subtarefasCreated++;
+          if (subError) {
+            failures.push({ row: i + 2, titulo: `${row.titulo} → subtarefa "${subTitulo}"`, error: subError.message });
+          } else {
+            subtarefasCreated++;
+          }
         }
       }
 
@@ -381,7 +402,7 @@ export function useCsvImport() {
         acoesCreated,
         subtarefasCreated,
         macroEtapasCreated,
-        projetoId,
+        projetoId: createdProjetoId,
         failures,
       };
 
@@ -393,12 +414,18 @@ export function useCsvImport() {
       queryClient.invalidateQueries({ queryKey: ['macro_etapas'] });
       queryClient.invalidateQueries({ queryKey: ['projetos'] });
     } catch (err: any) {
+      // Cleanup: if we created a project but import failed completely, delete it
+      if (!projetoId && createdProjetoId && acoesCreated === 0) {
+        await supabase.from('projetos').delete().eq('id', createdProjetoId);
+        queryClient.invalidateQueries({ queryKey: ['projetos'] });
+      }
+
       setImportResult({
         success: false,
         acoesCreated,
         subtarefasCreated,
         macroEtapasCreated,
-        projetoId,
+        projetoId: createdProjetoId || '',
         failures: [{ row: 0, titulo: '', error: err.message }],
       });
       setStep(3);

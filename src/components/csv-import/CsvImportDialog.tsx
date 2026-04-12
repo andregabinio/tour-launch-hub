@@ -6,7 +6,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { supabase } from '@/integrations/supabase/client';
 import { useCsvImport } from '@/hooks/useCsvImport';
 import CsvUploadStep from './CsvUploadStep';
 import CsvPreviewStep from './CsvPreviewStep';
@@ -57,28 +56,13 @@ export default function CsvImportDialog({
   );
 
   const handleImport = useCallback(async () => {
-    let targetProjetoId = projetoId;
-
-    // If no projetoId, create a new project first
-    if (!targetProjetoId) {
+    if (projetoId) {
+      await importToProject(projetoId);
+    } else {
       const name = projectName.trim();
       if (!name) return;
-
-      const id = crypto.randomUUID();
-      const { error } = await supabase.from('projetos').insert({
-        id,
-        nome: name,
-        descricao: 'Projeto importado via CSV',
-        status: 'ativo',
-        cor: '#3B82F6',
-      });
-      if (error) {
-        return;
-      }
-      targetProjetoId = id;
+      await importToProject(null, name);
     }
-
-    await importToProject(targetProjetoId);
   }, [projetoId, projectName, importToProject]);
 
   const handleOpenProject = useCallback(() => {
@@ -116,7 +100,8 @@ export default function CsvImportDialog({
             errors={errors}
             warnings={warnings}
             isImporting={isImporting}
-            onImport={canImport ? handleImport : () => {}}
+            canImport={canImport}
+            onImport={handleImport}
             onGoBack={goBack}
           />
         )}

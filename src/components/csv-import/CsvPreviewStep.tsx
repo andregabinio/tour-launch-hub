@@ -22,8 +22,15 @@ interface CsvPreviewStepProps {
   errors: ValidationIssue[];
   warnings: ValidationIssue[];
   isImporting: boolean;
+  canImport: boolean;
   onImport: () => void;
   onGoBack: () => void;
+}
+
+function formatDateBR(isoDate: string): string {
+  if (!isoDate) return '—';
+  const [y, m, d] = isoDate.split('-');
+  return `${d}/${m}/${y}`;
 }
 
 export default function CsvPreviewStep({
@@ -31,6 +38,7 @@ export default function CsvPreviewStep({
   errors,
   warnings,
   isImporting,
+  canImport,
   onImport,
   onGoBack,
 }: CsvPreviewStepProps) {
@@ -111,8 +119,8 @@ export default function CsvPreviewStep({
                     </TableCell>
                     <TableCell className="hidden md:table-cell">{row.responsavel || '—'}</TableCell>
                     <TableCell className="hidden sm:table-cell capitalize">{row.prioridade}</TableCell>
-                    <TableCell className="hidden lg:table-cell">{row.dataInicio}</TableCell>
-                    <TableCell className="hidden lg:table-cell">{row.dataFim}</TableCell>
+                    <TableCell className="hidden lg:table-cell">{formatDateBR(row.dataInicio)}</TableCell>
+                    <TableCell className="hidden lg:table-cell">{formatDateBR(row.dataFim)}</TableCell>
                     <TableCell className="hidden xl:table-cell">{row.tempoEstimado}</TableCell>
                     <TableCell className="hidden xl:table-cell">{row.dependencia || '—'}</TableCell>
                     <TableCell>
@@ -154,7 +162,7 @@ export default function CsvPreviewStep({
         </Button>
         <Button
           onClick={onImport}
-          disabled={hasErrors || isImporting}
+          disabled={hasErrors || isImporting || !canImport}
           className="gap-2"
         >
           {isImporting ? (
