@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, LogOut, Users, User } from 'lucide-react';
+import { Plus, LogOut, Users, User, Upload } from 'lucide-react';
 import { useProjetos } from '@/hooks/useProjetos';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useAuth } from '@/hooks/useAuth';
@@ -18,6 +18,7 @@ import ProjetoCard from '@/components/dashboard/ProjetoCard';
 import ProjetoCreateDialog from '@/components/dashboard/ProjetoCreateDialog';
 import TemplateSection from '@/components/dashboard/TemplateSection';
 import UserManagement from '@/components/admin/UserManagement';
+import CsvImportDialog from '@/components/csv-import/CsvImportDialog';
 
 type StatusFilter = 'ativo' | 'todos' | 'arquivado' | 'concluído';
 
@@ -37,6 +38,7 @@ const Dashboard = () => {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('ativo');
   const [showCreate, setShowCreate] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
+  const [showCsvImport, setShowCsvImport] = useState(false);
 
   const filteredProjetos = useMemo(() => {
     if (statusFilter === 'todos') return projetos;
@@ -71,10 +73,21 @@ const Dashboard = () => {
 
           <div className="flex items-center gap-3">
             {role === 'admin' && (
-              <Button size="sm" onClick={() => setShowCreate(true)} className="gap-2">
-                <Plus className="h-4 w-4" aria-hidden="true" />
-                Novo Projeto
-              </Button>
+              <>
+                <Button size="sm" onClick={() => setShowCreate(true)} className="gap-2">
+                  <Plus className="h-4 w-4" aria-hidden="true" />
+                  Novo Projeto
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowCsvImport(true)}
+                  className="gap-2"
+                >
+                  <Upload className="h-4 w-4" aria-hidden="true" />
+                  Importar CSV
+                </Button>
+              </>
             )}
 
             <DropdownMenu>
@@ -170,6 +183,7 @@ const Dashboard = () => {
       {/* Dialogs */}
       <ProjetoCreateDialog open={showCreate} onOpenChange={setShowCreate} />
       <UserManagement open={showAdmin} onOpenChange={setShowAdmin} />
+      <CsvImportDialog open={showCsvImport} onOpenChange={setShowCsvImport} />
     </div>
   );
 };

@@ -14,6 +14,7 @@ import UserManagement from '@/components/admin/UserManagement';
 import AcaoEditDialog from '@/components/roadmap/AcaoEditDialog';
 import MacroEtapaManager from '@/components/roadmap/MacroEtapaManager';
 import SaveAsTemplateDialog from '@/components/roadmap/SaveAsTemplateDialog';
+import CsvImportDialog from '@/components/csv-import/CsvImportDialog';
 import { RefreshCw, AlertCircle, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -40,6 +41,7 @@ const ProjetoPage = () => {
   const [showCreateAcao, setShowCreateAcao] = useState(false);
   const [showMacroManager, setShowMacroManager] = useState(false);
   const [showSaveTemplate, setShowSaveTemplate] = useState(false);
+  const [showCsvImport, setShowCsvImport] = useState(false);
 
   const isLoading = projetoLoading || acoesLoading;
   const error = projetoError || acoesError;
@@ -224,6 +226,7 @@ const ProjetoPage = () => {
         onManageEtapas={() => setShowMacroManager(true)}
         onSaveAsTemplate={() => setShowSaveTemplate(true)}
         onArchiveProjeto={handleArchiveProjeto}
+        onImportCsv={() => setShowCsvImport(true)}
       />
       <main className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8 space-y-6">
         {/* Global progress */}
@@ -301,6 +304,13 @@ const ProjetoPage = () => {
           onOpenChange={setShowSaveTemplate}
           projetoId={id}
           projetoNome={projeto.nome}
+        />
+      )}
+      {id && (
+        <CsvImportDialog
+          open={showCsvImport}
+          onOpenChange={setShowCsvImport}
+          projetoId={id}
         />
       )}
     </div>
