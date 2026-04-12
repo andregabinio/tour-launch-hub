@@ -1,4 +1,4 @@
-import { LayoutGrid, Table, LogOut, Users, User, Plus, GanttChart, ArrowLeft, Settings } from 'lucide-react';
+import { LayoutGrid, Table, LogOut, Users, User, Plus, GanttChart, ArrowLeft, Settings, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,9 +23,10 @@ interface TopBarProps {
   onManageEtapas?: () => void;
   onSaveAsTemplate?: () => void;
   onArchiveProjeto?: () => void;
+  onImportCsv?: () => void;
 }
 
-const TopBar = ({ viewMode, onViewModeChange, onOpenAdmin, onCreateAcao, projetoNome, onManageEtapas, onSaveAsTemplate, onArchiveProjeto }: TopBarProps) => {
+const TopBar = ({ viewMode, onViewModeChange, onOpenAdmin, onCreateAcao, projetoNome, onManageEtapas, onSaveAsTemplate, onArchiveProjeto, onImportCsv }: TopBarProps) => {
   const { profile, role } = useAuthContext();
   const { signOut } = useAuth();
   const navigate = useNavigate();
@@ -71,6 +72,12 @@ const TopBar = ({ viewMode, onViewModeChange, onOpenAdmin, onCreateAcao, projeto
             <Button size="sm" onClick={onCreateAcao} className="gap-2">
               <Plus className="h-4 w-4" aria-hidden="true" />
               Nova Ação
+            </Button>
+          )}
+          {canEdit && onImportCsv && (
+            <Button variant="outline" size="sm" onClick={onImportCsv} className="gap-2">
+              <Upload className="h-4 w-4" aria-hidden="true" />
+              <span className="hidden sm:inline">Importar CSV</span>
             </Button>
           )}
           <div className="flex items-center gap-1 rounded-lg border border-border bg-muted p-1" role="tablist" aria-label="Modo de visualização">
