@@ -108,26 +108,28 @@ const AcaoEditDialog = ({ open, onOpenChange, acao, allAcoes = [], projetoId }: 
 
   const set = (key: string, value: string) => setForm(prev => ({ ...prev, [key]: value }));
 
-  // Auto-calcula data_fim a partir de data_inicio + tempo_estimado.
-  // Aceita "X dia(s)", "X semana(s)", "X mes/mês/meses", "X hora(s)" (mesmo dia).
-  // Só dispara na criação — em edição respeitamos o que o user digitou.
+  // Auto-calcula data_fim a partir de data_inicio + tempo_estimado (só na criação).
+  // Aceita "X dia(s)", "X semana(s)", "X mes/mês/meses", "X hora(s)".
+  // Sem tempo_estimado ou formato não reconhecido → data_fim = data_inicio.
   useEffect(() => {
     if (isEdit) return;
-    if (!form.data_inicio || !form.tempo_estimado) return;
+    if (!form.data_inicio) return;
 
-    const m = form.tempo_estimado
-      .toLowerCase()
-      .trim()
-      .match(/^(\d+(?:[.,]\d+)?)\s*(hora|horas|h|dia|dias|d|semana|semanas|sem|mes|mês|meses|m)\b/);
-    if (!m) return;
-
-    const qtd = parseFloat(m[1].replace(',', '.'));
-    const unit = m[2];
     let diasAdd = 0;
-    if (unit.startsWith('h')) diasAdd = 0;
-    else if (unit.startsWith('d')) diasAdd = Math.max(0, Math.round(qtd) - 1);
-    else if (unit.startsWith('sem')) diasAdd = Math.max(0, Math.round(qtd * 7) - 1);
-    else if (unit.startsWith('m')) diasAdd = Math.max(0, Math.round(qtd * 30) - 1);
+    if (form.tempo_estimado) {
+      const m = form.tempo_estimado
+        .toLowerCase()
+        .trim()
+        .match(/^(\d+(?:[.,]\d+)?)\s*(hora|horas|h|dia|dias|d|semana|semanas|sem|mes|mês|meses|m)\b/);
+      if (m) {
+        const qtd = parseFloat(m[1].replace(',', '.'));
+        const unit = m[2];
+        if (unit.startsWith('h')) diasAdd = 0;
+        else if (unit.startsWith('d')) diasAdd = Math.max(0, Math.round(qtd) - 1);
+        else if (unit.startsWith('sem')) diasAdd = Math.max(0, Math.round(qtd * 7) - 1);
+        else if (unit.startsWith('m')) diasAdd = Math.max(0, Math.round(qtd * 30) - 1);
+      }
+    }
 
     const inicio = new Date(form.data_inicio + 'T00:00:00');
     if (Number.isNaN(inicio.getTime())) return;
@@ -229,7 +231,20 @@ const AcaoEditDialog = ({ open, onOpenChange, acao, allAcoes = [], projetoId }: 
             </div>
             <div className="space-y-1.5">
               <Label className="lowercase">data fim *</Label>
-              <Input type="date" value={form.data_fim} onChange={e => set('data_fim', e.target.value)} />
+              <Input
+                type="date"
+                value={form.data_fim}
+                onChange={e => set('data_fim', e.target.value)}
+                disabled={!isEdit}
+                className={!isEdit ? 'bg-muted cursor-not-allowed opacity-90' : ''}
+              />
+              {!isEdit && (
+                <p className="text-[11px] text-muted-foreground lowercase">
+                  {form.tempo_estimado
+                    ? 'calculado a partir do tempo estimado'
+                    : 'informe o tempo estimado para calcular'}
+                </p>
+              )}
             </div>
           </div>
           <div className="space-y-1.5">
