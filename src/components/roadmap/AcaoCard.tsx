@@ -36,11 +36,11 @@ const AcaoCard = ({ acao, allAcoes, onEdit }: AcaoCardProps) => {
     : null;
 
   const borderClass = acao.bloqueada
-    ? 'border-l-4 border-l-blocked'
+    ? 'border-l-4 border-l-brand-bordo'
     : acao.situacaoPrazo === 'atrasada'
-    ? 'border-l-4 border-l-destructive'
+    ? 'border-l-4 border-l-brand-bordo'
     : acao.prioridade === 'alta'
-    ? 'border-l-4 border-l-warning'
+    ? 'border-l-4 border-l-brand-laranja'
     : 'border-l-4 border-l-transparent';
 
   const cycleStatus = async () => {

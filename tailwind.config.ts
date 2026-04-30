@@ -67,6 +67,14 @@ export default {
           medium: "hsl(var(--priority-medium))",
           low: "hsl(var(--priority-low))",
         },
+        brand: {
+          azul: "hsl(var(--brand-azul))",
+          creme: "hsl(var(--brand-creme))",
+          verde: "hsl(var(--brand-verde))",
+          laranja: "hsl(var(--brand-laranja))",
+          bordo: "hsl(var(--brand-bordo))",
+          amarelo: "hsl(var(--brand-amarelo))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

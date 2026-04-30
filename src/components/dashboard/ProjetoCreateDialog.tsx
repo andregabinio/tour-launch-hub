@@ -99,7 +99,7 @@ const ProjetoCreateDialog = ({ open, onOpenChange }: ProjetoCreateDialogProps) =
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Novo Projeto</DialogTitle>
+          <DialogTitle className="lowercase">novo lançamento</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -190,11 +190,12 @@ const ProjetoCreateDialog = ({ open, onOpenChange }: ProjetoCreateDialogProps) =
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
+              className="lowercase"
             >
-              Cancelar
+              cancelar
             </Button>
-            <Button type="submit" disabled={submitting || !nome.trim()}>
-              {submitting ? 'Criando...' : 'Criar Projeto'}
+            <Button type="submit" disabled={submitting || !nome.trim()} className="lowercase">
+              {submitting ? 'criando...' : 'criar lançamento'}
             </Button>
           </div>
         </form>

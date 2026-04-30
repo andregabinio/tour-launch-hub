@@ -5,9 +5,9 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 
 const statusConfig: Record<Projeto['status'], { label: string; className: string }> = {
-  ativo: { label: 'Ativo', className: 'bg-green-500/15 text-green-700 dark:text-green-400 border-green-500/20' },
-  arquivado: { label: 'Arquivado', className: 'bg-gray-500/15 text-gray-700 dark:text-gray-400 border-gray-500/20' },
-  'concluído': { label: 'Concluído', className: 'bg-blue-500/15 text-blue-700 dark:text-blue-400 border-blue-500/20' },
+  ativo: { label: 'ativo', className: 'bg-brand-verde/15 text-brand-verde border-brand-verde/30' },
+  arquivado: { label: 'arquivado', className: 'bg-muted text-muted-foreground border-border' },
+  'concluído': { label: 'concluído', className: 'bg-brand-azul/15 text-brand-azul border-brand-azul/30' },
 };
 
 interface ProjetoCardProps {
@@ -47,14 +47,14 @@ const ProjetoCard = ({ projeto }: ProjetoCardProps) => {
 
       <div className="mt-3 space-y-1.5">
         <Progress value={progressPercent} className="h-2" />
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <div className="flex items-center justify-between text-xs text-muted-foreground lowercase">
           <span>{concluidas}/{totalAcoes} ações concluídas</span>
           <span>{progressPercent}%</span>
         </div>
       </div>
 
-      <p className="mt-3 text-xs text-muted-foreground">
-        Criado em {createdDate}
+      <p className="mt-3 text-xs text-muted-foreground lowercase">
+        criado em {createdDate}
       </p>
     </button>
   );

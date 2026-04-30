@@ -39,9 +39,16 @@
     --blocked: 199 38% 50%;
     --blocked-foreground: 0 0% 100%;
 
-    --priority-high: 348 42% 43%;
-    --priority-medium: 29 72% 50%;
+    --priority-high: 348 60% 36%;
+    --priority-medium: 45 81% 56%;
     --priority-low: 91 40% 42%;
+
+    --brand-azul: 215 60% 41%;
+    --brand-creme: 58 100% 95%;
+    --brand-verde: 91 40% 42%;
+    --brand-laranja: 23 70% 47%;
+    --brand-bordo: 348 60% 36%;
+    --brand-amarelo: 45 81% 56%;
 
     --border: 50 25% 87%;
     --input: 50 25% 87%;
@@ -86,9 +93,16 @@
     --blocked: 199 38% 55%;
     --blocked-foreground: 0 0% 100%;
 
-    --priority-high: 348 42% 45%;
-    --priority-medium: 29 65% 55%;
+    --priority-high: 348 60% 50%;
+    --priority-medium: 45 81% 60%;
     --priority-low: 91 40% 45%;
+
+    --brand-azul: 215 55% 55%;
+    --brand-creme: 58 100% 95%;
+    --brand-verde: 91 40% 45%;
+    --brand-laranja: 23 70% 55%;
+    --brand-bordo: 348 60% 50%;
+    --brand-amarelo: 45 81% 60%;
 
     --border: 215 25% 18%;
     --input: 215 25% 18%;
@@ -118,6 +132,38 @@
 @layer utilities {
   .glass-card {
     @apply bg-card border border-border shadow-sm hover:shadow-md transition-shadow duration-200;
+  }
+
+  /* Picote (zigzag) — asset central da brand Tour 2026 */
+  .picote-divider {
+    height: 10px;
+    background-color: hsl(var(--brand-azul));
+    -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='10' viewBox='0 0 20 10' preserveAspectRatio='none'><polygon points='0,0 10,10 20,0 20,10 0,10' fill='black'/></svg>");
+            mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='10' viewBox='0 0 20 10' preserveAspectRatio='none'><polygon points='0,0 10,10 20,0 20,10 0,10' fill='black'/></svg>");
+    -webkit-mask-repeat: repeat-x;
+            mask-repeat: repeat-x;
+    -webkit-mask-size: 20px 10px;
+            mask-size: 20px 10px;
+  }
+
+  .picote-divider-creme {
+    height: 10px;
+    background-color: hsl(var(--brand-creme));
+    -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='10' viewBox='0 0 20 10' preserveAspectRatio='none'><polygon points='0,10 10,0 20,10 20,0 0,0' fill='black'/></svg>");
+            mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='10' viewBox='0 0 20 10' preserveAspectRatio='none'><polygon points='0,10 10,0 20,10 20,0 0,0' fill='black'/></svg>");
+    -webkit-mask-repeat: repeat-x;
+            mask-repeat: repeat-x;
+    -webkit-mask-size: 20px 10px;
+            mask-size: 20px 10px;
+  }
+
+  /* Wallpaper sutil — trama de picotes em diagonal pra fundos (Login) */
+  .picote-bg {
+    background-color: hsl(var(--brand-creme));
+    background-image:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='20' viewBox='0 0 40 20'><polyline points='0,20 10,0 20,20 30,0 40,20' fill='none' stroke='hsl(215,60%25,41%25)' stroke-width='1.5' opacity='0.08'/></svg>");
+    background-repeat: repeat;
+    background-size: 40px 20px;
   }
 
   /* Custom scrollbar for timeline */

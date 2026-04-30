@@ -18,12 +18,12 @@ const SummaryCards = ({ acoes, activeCard, onCardClick }: SummaryCardsProps) => 
   const prioridadeAlta = acoes.filter(a => a.prioridade === 'alta').length;
 
   const cards: { label: string; value: number; icon: typeof ListTodo; color: string; bg: string; filterKey: CardFilterKey }[] = [
-    { label: 'Total de Ações', value: total, icon: ListTodo, color: 'text-primary', bg: 'bg-primary/10', filterKey: 'total' },
-    { label: 'Em Andamento', value: emAndamento, icon: Clock, color: 'text-primary', bg: 'bg-primary/10', filterKey: 'em andamento' },
-    { label: 'Concluídas', value: concluidas, icon: CheckCircle2, color: 'text-success', bg: 'bg-success/10', filterKey: 'concluída' },
-    { label: 'Atrasadas', value: atrasadas, icon: AlertTriangle, color: 'text-destructive', bg: 'bg-destructive/10', filterKey: 'atrasada' },
-    { label: 'Bloqueadas', value: bloqueadas, icon: Lock, color: 'text-blocked', bg: 'bg-blocked/10', filterKey: 'bloqueada' },
-    { label: 'Prioridade Alta', value: prioridadeAlta, icon: Flame, color: 'text-warning', bg: 'bg-warning/10', filterKey: 'alta' },
+    { label: 'total de ações', value: total, icon: ListTodo, color: 'text-brand-azul', bg: 'bg-brand-azul/10', filterKey: 'total' },
+    { label: 'em andamento', value: emAndamento, icon: Clock, color: 'text-brand-azul', bg: 'bg-brand-azul/10', filterKey: 'em andamento' },
+    { label: 'concluídas', value: concluidas, icon: CheckCircle2, color: 'text-brand-verde', bg: 'bg-brand-verde/10', filterKey: 'concluída' },
+    { label: 'atrasadas', value: atrasadas, icon: AlertTriangle, color: 'text-brand-bordo', bg: 'bg-brand-bordo/10', filterKey: 'atrasada' },
+    { label: 'bloqueadas', value: bloqueadas, icon: Lock, color: 'text-brand-bordo', bg: 'bg-brand-bordo/10', filterKey: 'bloqueada' },
+    { label: 'prioridade alta', value: prioridadeAlta, icon: Flame, color: 'text-brand-laranja', bg: 'bg-brand-laranja/10', filterKey: 'alta' },
   ];
 
   return (
@@ -38,7 +38,7 @@ const SummaryCards = ({ acoes, activeCard, onCardClick }: SummaryCardsProps) => 
             aria-pressed={isActive}
             aria-label={`${card.label}: ${card.value}. ${isActive ? 'Filtro ativo' : 'Clique para filtrar'}`}
             className={`glass-card rounded-lg p-4 cursor-pointer transition-all hover:scale-[1.03] active:scale-[0.97] hover:shadow-md text-left w-full ${
-              isActive ? 'ring-2 ring-primary shadow-md' : ''
+              isActive ? 'ring-2 ring-brand-azul shadow-md' : ''
             }`}
           >
             <div className="flex items-center gap-3">
@@ -46,8 +46,8 @@ const SummaryCards = ({ acoes, activeCard, onCardClick }: SummaryCardsProps) => 
                 <card.icon className={`h-5 w-5 ${card.color}`} aria-hidden="true" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-foreground">{card.value}</p>
-                <p className="text-xs text-muted-foreground leading-tight">{card.label}</p>
+                <p className="text-2xl font-extrabold text-foreground">{card.value}</p>
+                <p className="text-xs text-muted-foreground leading-tight lowercase">{card.label}</p>
               </div>
             </div>
           </button>

@@ -112,7 +112,7 @@ const AcaoEditDialog = ({ open, onOpenChange, acao, allAcoes = [], projetoId }: 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{isEdit ? 'Editar Ação' : 'Nova Ação'}</DialogTitle>
+          <DialogTitle className="lowercase">{isEdit ? 'editar ação' : 'nova ação'}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
           <div className={`grid ${isEdit ? 'grid-cols-2' : 'grid-cols-1'} gap-3`}>
@@ -213,32 +213,32 @@ const AcaoEditDialog = ({ open, onOpenChange, acao, allAcoes = [], projetoId }: 
           {isEdit ? (
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="ghost" className="text-destructive hover:text-destructive hover:bg-destructive/10 gap-1.5">
-                  <Trash2 className="h-4 w-4" /> Excluir
+                <Button variant="ghost" className="text-destructive hover:text-destructive hover:bg-destructive/10 gap-1.5 lowercase">
+                  <Trash2 className="h-4 w-4" /> excluir
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Excluir ação?</AlertDialogTitle>
+                  <AlertDialogTitle className="lowercase">excluir ação?</AlertDialogTitle>
                   <AlertDialogDescription>
                     A ação <strong>{acao?.id} — {acao?.titulo}</strong> e todas as suas subtarefas serão excluídas permanentemente.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogCancel className="lowercase">cancelar</AlertDialogCancel>
                   <AlertDialogAction
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90 lowercase"
                     onClick={async () => {
                       try {
                         await deleteAcao.mutateAsync(acao!.id);
-                        toast.success('Ação excluída!');
+                        toast.success('ação excluída');
                         onOpenChange(false);
                       } catch (e: any) {
-                        toast.error(e.message || 'Erro ao excluir ação');
+                        toast.error(e.message || 'erro ao excluir ação');
                       }
                     }}
                   >
-                    Excluir
+                    excluir
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -247,9 +247,9 @@ const AcaoEditDialog = ({ open, onOpenChange, acao, allAcoes = [], projetoId }: 
             <div />
           )}
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-            <Button onClick={handleSubmit} disabled={createAcao.isPending || updateAcao.isPending}>
-              {(createAcao.isPending || updateAcao.isPending) ? 'Salvando...' : 'Salvar'}
+            <Button variant="outline" onClick={() => onOpenChange(false)} className="lowercase">cancelar</Button>
+            <Button onClick={handleSubmit} disabled={createAcao.isPending || updateAcao.isPending} className="lowercase">
+              {(createAcao.isPending || updateAcao.isPending) ? 'salvando...' : 'salvar'}
             </Button>
           </div>
         </DialogFooter>

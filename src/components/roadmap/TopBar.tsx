@@ -42,7 +42,8 @@ const TopBar = ({ viewMode, onViewModeChange, onOpenAdmin, onCreateAcao, projeto
   };
 
   return (
-    <header className="border-b border-border bg-card px-4 py-4 sm:px-6 lg:px-8">
+    <>
+    <header className="bg-card px-4 py-5 sm:px-6 lg:px-8">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           {projetoNome && (
@@ -50,34 +51,34 @@ const TopBar = ({ viewMode, onViewModeChange, onOpenAdmin, onCreateAcao, projeto
               variant="ghost"
               size="sm"
               onClick={() => navigate('/')}
-              className="gap-1"
-              aria-label="Voltar para projetos"
+              className="gap-1 lowercase"
+              aria-label="voltar para lançamentos"
             >
               <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-              Projetos
+              lançamentos
             </Button>
           )}
-          <img src="/logo.png" alt="Tour" className="h-10 w-10 rounded-lg object-cover" />
+          <img src="/logo.png" alt="Tour" className="h-11 w-11 rounded-lg object-cover" />
           <div>
-            <h1 className="text-xl font-bold tracking-tight text-foreground">
-              {projetoNome || 'Roadmap de Lançamento do TOUR'}
+            <h1 className="text-2xl font-extrabold tracking-tight text-foreground lowercase">
+              {projetoNome || 'roadmap de lançamento'}
             </h1>
-            <p className="text-sm text-muted-foreground">
-              Planejamento e acompanhamento estratégico
+            <p className="text-sm text-muted-foreground lowercase">
+              acompanhe e movimente seu lançamento
             </p>
           </div>
         </div>
         <div className="flex items-center gap-3">
           {canEdit && onCreateAcao && (
-            <Button size="sm" onClick={onCreateAcao} className="gap-2">
+            <Button size="sm" onClick={onCreateAcao} className="gap-2 font-semibold lowercase">
               <Plus className="h-4 w-4" aria-hidden="true" />
-              Nova Ação
+              nova ação
             </Button>
           )}
           {canEdit && onImportCsv && (
-            <Button variant="outline" size="sm" onClick={onImportCsv} className="gap-2">
+            <Button variant="outline" size="sm" onClick={onImportCsv} className="gap-2 font-semibold lowercase">
               <Upload className="h-4 w-4" aria-hidden="true" />
-              <span className="hidden sm:inline">Importar CSV</span>
+              <span className="hidden sm:inline">importar csv</span>
             </Button>
           )}
           <div className="flex items-center gap-1 rounded-lg border border-border bg-muted p-1" role="tablist" aria-label="Modo de visualização">
@@ -124,20 +125,20 @@ const TopBar = ({ viewMode, onViewModeChange, onOpenAdmin, onCreateAcao, projeto
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 {onManageEtapas && (
-                  <DropdownMenuItem onClick={onManageEtapas} className="gap-2">
-                    Gerenciar Macro Etapas
+                  <DropdownMenuItem onClick={onManageEtapas} className="gap-2 lowercase">
+                    gerenciar macro etapas
                   </DropdownMenuItem>
                 )}
                 {onSaveAsTemplate && (
-                  <DropdownMenuItem onClick={onSaveAsTemplate} className="gap-2">
-                    Salvar como Modelo
+                  <DropdownMenuItem onClick={onSaveAsTemplate} className="gap-2 lowercase">
+                    salvar como modelo
                   </DropdownMenuItem>
                 )}
                 {onArchiveProjeto && (
                   <>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={onArchiveProjeto} className="gap-2 text-destructive">
-                      Arquivar Projeto
+                    <DropdownMenuItem onClick={onArchiveProjeto} className="gap-2 text-destructive lowercase">
+                      arquivar lançamento
                     </DropdownMenuItem>
                   </>
                 )}
@@ -161,20 +162,22 @@ const TopBar = ({ viewMode, onViewModeChange, onOpenAdmin, onCreateAcao, projeto
               <DropdownMenuSeparator />
               {role === 'admin' && onOpenAdmin && (
                 <>
-                  <DropdownMenuItem onClick={onOpenAdmin} className="gap-2">
-                    <Users className="h-4 w-4" /> Gerenciar Usuários
+                  <DropdownMenuItem onClick={onOpenAdmin} className="gap-2 lowercase">
+                    <Users className="h-4 w-4" /> gerenciar acessos
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                 </>
               )}
-              <DropdownMenuItem onClick={handleLogout} className="gap-2 text-destructive">
-                <LogOut className="h-4 w-4" /> Sair
+              <DropdownMenuItem onClick={handleLogout} className="gap-2 text-destructive lowercase">
+                <LogOut className="h-4 w-4" /> sair
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>
     </header>
+    <div className="picote-divider" aria-hidden="true" />
+    </>
   );
 };
 

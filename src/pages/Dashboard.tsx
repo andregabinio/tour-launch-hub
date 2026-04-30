@@ -23,10 +23,10 @@ import CsvImportDialog from '@/components/csv-import/CsvImportDialog';
 type StatusFilter = 'ativo' | 'todos' | 'arquivado' | 'concluído';
 
 const STATUS_TABS: { key: StatusFilter; label: string }[] = [
-  { key: 'ativo', label: 'Ativos' },
-  { key: 'todos', label: 'Todos' },
-  { key: 'arquivado', label: 'Arquivados' },
-  { key: 'concluído', label: 'Concluídos' },
+  { key: 'ativo', label: 'ativos' },
+  { key: 'todos', label: 'todos' },
+  { key: 'arquivado', label: 'arquivados' },
+  { key: 'concluído', label: 'concluídos' },
 ];
 
 const Dashboard = () => {
@@ -57,16 +57,16 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border bg-card px-4 py-4 sm:px-6 lg:px-8">
+      <header className="bg-card px-4 py-5 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="Tour" className="h-10 w-10 rounded-lg object-cover" />
+            <img src="/logo.png" alt="Tour" className="h-11 w-11 rounded-lg object-cover" />
             <div>
-              <h1 className="text-xl font-bold tracking-tight text-foreground">
-                Tour Launch Hub
+              <h1 className="text-2xl font-extrabold tracking-tight text-foreground lowercase">
+                tour launch hub
               </h1>
-              <p className="text-sm text-muted-foreground">
-                Seus projetos de lançamento
+              <p className="text-sm text-muted-foreground lowercase">
+                seus lançamentos em movimento
               </p>
             </div>
           </div>
@@ -74,18 +74,18 @@ const Dashboard = () => {
           <div className="flex items-center gap-3">
             {role === 'admin' && (
               <>
-                <Button size="sm" onClick={() => setShowCreate(true)} className="gap-2">
+                <Button size="sm" onClick={() => setShowCreate(true)} className="gap-2 font-semibold lowercase">
                   <Plus className="h-4 w-4" aria-hidden="true" />
-                  Novo Projeto
+                  novo lançamento
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setShowCsvImport(true)}
-                  className="gap-2"
+                  className="gap-2 font-semibold lowercase"
                 >
                   <Upload className="h-4 w-4" aria-hidden="true" />
-                  Importar CSV
+                  importar csv
                 </Button>
               </>
             )}
@@ -107,20 +107,21 @@ const Dashboard = () => {
                 <DropdownMenuSeparator />
                 {role === 'admin' && (
                   <>
-                    <DropdownMenuItem onClick={() => setShowAdmin(true)} className="gap-2">
-                      <Users className="h-4 w-4" /> Gerenciar Usuários
+                    <DropdownMenuItem onClick={() => setShowAdmin(true)} className="gap-2 lowercase">
+                      <Users className="h-4 w-4" /> gerenciar acessos
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                   </>
                 )}
-                <DropdownMenuItem onClick={handleLogout} className="gap-2 text-destructive">
-                  <LogOut className="h-4 w-4" /> Sair
+                <DropdownMenuItem onClick={handleLogout} className="gap-2 text-destructive lowercase">
+                  <LogOut className="h-4 w-4" /> sair
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </div>
       </header>
+      <div className="picote-divider" aria-hidden="true" />
 
       {/* Main content */}
       <main className="mx-auto max-w-[1200px] px-4 py-6 sm:px-6 lg:px-8 space-y-6">
@@ -158,20 +159,20 @@ const Dashboard = () => {
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <p className="text-lg font-medium text-foreground">
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <p className="text-2xl font-extrabold text-foreground lowercase">
               {statusFilter === 'ativo'
-                ? 'Nenhum projeto ativo'
+                ? 'nada em movimento por aqui'
                 : statusFilter === 'arquivado'
-                ? 'Nenhum projeto arquivado'
+                ? 'nada arquivado'
                 : statusFilter === 'concluído'
-                ? 'Nenhum projeto concluído'
-                : 'Nenhum projeto encontrado'}
+                ? 'nada concluído ainda'
+                : 'nenhum lançamento encontrado'}
             </p>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="mt-2 text-sm text-muted-foreground lowercase">
               {statusFilter === 'ativo' && role === 'admin'
-                ? 'Crie um novo projeto para começar.'
-                : 'Nenhum projeto neste filtro.'}
+                ? 'crie um novo lançamento pra começar.'
+                : 'troque o filtro pra ver o que existe.'}
             </p>
           </div>
         )}

@@ -62,7 +62,7 @@ const SaveAsTemplateDialog = ({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Salvar como Modelo</DialogTitle>
+          <DialogTitle className="lowercase">salvar como modelo</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
           <div className="space-y-1.5">
@@ -95,11 +95,11 @@ const SaveAsTemplateDialog = ({
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => handleOpenChange(false)}>
-            Cancelar
+          <Button variant="outline" onClick={() => handleOpenChange(false)} className="lowercase">
+            cancelar
           </Button>
-          <Button onClick={handleSubmit} disabled={saveAsTemplate.isPending}>
-            {saveAsTemplate.isPending ? 'Salvando...' : 'Salvar Modelo'}
+          <Button onClick={handleSubmit} disabled={saveAsTemplate.isPending} className="lowercase">
+            {saveAsTemplate.isPending ? 'salvando...' : 'salvar modelo'}
           </Button>
         </DialogFooter>
       </DialogContent>
