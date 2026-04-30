@@ -40,8 +40,8 @@ const TableView = ({ acoes, onEditAcao }: TableViewProps) => {
   if (acoes.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-        <p className="text-lg font-medium">Nenhuma ação encontrada</p>
-        <p className="text-sm">Tente ajustar os filtros</p>
+        <p className="text-lg font-extrabold lowercase">nenhuma ação encontrada</p>
+        <p className="text-sm lowercase">tente ajustar os filtros</p>
       </div>
     );
   }
@@ -51,20 +51,20 @@ const TableView = ({ acoes, onEditAcao }: TableViewProps) => {
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted/50">
-              <TableHead className="w-[80px]">ID</TableHead>
-              <TableHead>Título</TableHead>
-              <TableHead className="hidden lg:table-cell">Macro Etapa</TableHead>
-              <TableHead>Responsável</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Prioridade</TableHead>
-              <TableHead className="hidden md:table-cell">Início</TableHead>
-              <TableHead className="hidden md:table-cell">Fim</TableHead>
-              <TableHead>Situação</TableHead>
-              <TableHead className="hidden xl:table-cell">Tempo Est.</TableHead>
-              <TableHead className="hidden xl:table-cell">Dependência</TableHead>
-              <TableHead className="text-center hidden sm:table-cell">Subtarefas</TableHead>
-              <TableHead className="hidden xl:table-cell">Bloqueada</TableHead>
+            <TableRow className="bg-muted/50 [&_th]:lowercase">
+              <TableHead className="w-[80px]">id</TableHead>
+              <TableHead>título</TableHead>
+              <TableHead className="hidden lg:table-cell">macro etapa</TableHead>
+              <TableHead>responsável</TableHead>
+              <TableHead>status</TableHead>
+              <TableHead>prioridade</TableHead>
+              <TableHead className="hidden md:table-cell">início</TableHead>
+              <TableHead className="hidden md:table-cell">fim</TableHead>
+              <TableHead>situação</TableHead>
+              <TableHead className="hidden xl:table-cell">tempo est.</TableHead>
+              <TableHead className="hidden xl:table-cell">dependência</TableHead>
+              <TableHead className="text-center hidden sm:table-cell">subtarefas</TableHead>
+              <TableHead className="hidden xl:table-cell">bloqueada</TableHead>
               {canEdit && <TableHead className="w-[80px]"></TableHead>}
             </TableRow>
           </TableHeader>
@@ -100,7 +100,7 @@ const TableView = ({ acoes, onEditAcao }: TableViewProps) => {
                       </button>
                     </TooltipTrigger>
                     {canEdit && (
-                      <TooltipContent>Clique para alterar status</TooltipContent>
+                      <TooltipContent className="lowercase">clique para alterar status</TooltipContent>
                     )}
                   </Tooltip>
                 </TableCell>
@@ -122,7 +122,7 @@ const TableView = ({ acoes, onEditAcao }: TableViewProps) => {
                   {acao.subtarefas.filter(s => s.status === 'concluída').length}/{acao.subtarefas.length}
                 </TableCell>
                 <TableCell className="text-xs hidden xl:table-cell">
-                  {acao.bloqueada ? <span className="text-blocked font-medium">Sim</span> : '—'}
+                  {acao.bloqueada ? <span className="text-brand-bordo font-medium lowercase">sim</span> : '—'}
                 </TableCell>
                 {canEdit && (
                   <TableCell>
@@ -138,25 +138,25 @@ const TableView = ({ acoes, onEditAcao }: TableViewProps) => {
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Excluir ação?</AlertDialogTitle>
+                            <AlertDialogTitle className="lowercase">excluir ação?</AlertDialogTitle>
                             <AlertDialogDescription>
                               A ação <strong>{acao.id} — {acao.titulo}</strong> e todas as suas subtarefas serão excluídas permanentemente.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            <AlertDialogCancel className="lowercase">cancelar</AlertDialogCancel>
                             <AlertDialogAction
-                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 lowercase"
                               onClick={async () => {
                                 try {
                                   await deleteAcao.mutateAsync(acao.id);
-                                  toast.success('Ação excluída!');
+                                  toast.success('ação excluída');
                                 } catch (e: any) {
-                                  toast.error(e.message || 'Erro ao excluir ação');
+                                  toast.error(e.message || 'erro ao excluir ação');
                                 }
                               }}
                             >
-                              Excluir
+                              excluir
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>

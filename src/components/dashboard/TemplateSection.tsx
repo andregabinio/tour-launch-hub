@@ -27,9 +27,9 @@ const TemplateSection = () => {
   const handleDelete = async (id: string) => {
     try {
       await deleteTemplate.mutateAsync(id);
-      toast.success('Modelo excluído');
+      toast.success('modelo excluído');
     } catch (error: any) {
-      toast.error(error.message || 'Erro ao excluir modelo');
+      toast.error(error.message || 'erro ao excluir modelo');
     }
   };
 
@@ -37,11 +37,11 @@ const TemplateSection = () => {
     <div className="mt-8">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-        aria-label={expanded ? 'Recolher modelos' : 'Expandir modelos'}
+        className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors lowercase"
+        aria-label={expanded ? 'recolher modelos' : 'expandir modelos'}
       >
         <FileText className="h-4 w-4" aria-hidden="true" />
-        <span>Modelos ({templates.length})</span>
+        <span>modelos ({templates.length})</span>
         {expanded ? (
           <ChevronUp className="h-4 w-4" aria-hidden="true" />
         ) : (
@@ -83,18 +83,18 @@ const TemplateSection = () => {
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Excluir modelo</AlertDialogTitle>
+                      <AlertDialogTitle className="lowercase">excluir modelo</AlertDialogTitle>
                       <AlertDialogDescription>
                         Tem certeza que deseja excluir o modelo "{tmpl.nome}"? Esta ação não pode ser desfeita.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogCancel className="lowercase">cancelar</AlertDialogCancel>
                       <AlertDialogAction
                         onClick={() => handleDelete(tmpl.id)}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90 lowercase"
                       >
-                        Excluir
+                        excluir
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>

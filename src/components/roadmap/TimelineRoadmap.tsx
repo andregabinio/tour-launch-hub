@@ -135,14 +135,14 @@ const AcaoDetail = ({ acao, allAcoes, onClose, onEdit }: { acao: Acao; allAcoes:
                 </button>
               </TooltipTrigger>
               {canEdit && (
-                <TooltipContent>Clique para alterar status</TooltipContent>
+                <TooltipContent className="lowercase">clique para alterar status</TooltipContent>
               )}
             </Tooltip>
             <PrioridadeBadge prioridade={acao.prioridade} />
             <SituacaoPrazoBadge situacao={acao.situacaoPrazo} />
             {canEdit && onEdit && (
-              <Button variant="ghost" size="sm" className="ml-auto h-7 gap-1.5 text-xs" onClick={() => { onEdit(acao); onClose(); }} aria-label="Editar ação">
-                <Pencil className="h-3.5 w-3.5" aria-hidden="true" /> Editar
+              <Button variant="ghost" size="sm" className="ml-auto h-7 gap-1.5 text-xs lowercase" onClick={() => { onEdit(acao); onClose(); }} aria-label="editar ação">
+                <Pencil className="h-3.5 w-3.5" aria-hidden="true" /> editar
               </Button>
             )}
           </div>
@@ -285,8 +285,8 @@ const TimelineRoadmap = ({ acoes, allAcoes, macroEtapas, onEditAcao }: TimelineR
   if (acoes.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-        <p className="text-lg font-medium">Nenhuma ação encontrada</p>
-        <p className="text-sm">Tente ajustar os filtros</p>
+        <p className="text-lg font-extrabold lowercase">nenhuma ação encontrada</p>
+        <p className="text-sm lowercase">tente ajustar os filtros</p>
       </div>
     );
   }

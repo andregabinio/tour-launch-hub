@@ -97,7 +97,7 @@ const MacroEtapaManager = ({ open, onOpenChange, projetoId }: MacroEtapaManagerP
 
   const handleSaveEdit = async () => {
     if (!editingId || !editForm.nome.trim()) {
-      toast.error('Nome é obrigatório');
+      toast.error('nome é obrigatório');
       return;
     }
     try {
@@ -108,7 +108,7 @@ const MacroEtapaManager = ({ open, onOpenChange, projetoId }: MacroEtapaManagerP
         descricao: editForm.descricao.trim() || null,
         cor: editForm.cor,
       });
-      toast.success('Etapa atualizada!');
+      toast.success('etapa atualizada');
       handleCancelEdit();
     } catch (error: any) {
       toast.error(error.message || 'Erro ao atualizar etapa');
@@ -117,7 +117,7 @@ const MacroEtapaManager = ({ open, onOpenChange, projetoId }: MacroEtapaManagerP
 
   const handleCreate = async () => {
     if (!newForm.nome.trim()) {
-      toast.error('Nome é obrigatório');
+      toast.error('nome é obrigatório');
       return;
     }
     try {
@@ -131,7 +131,7 @@ const MacroEtapaManager = ({ open, onOpenChange, projetoId }: MacroEtapaManagerP
         ordem,
         projeto_id: projetoId,
       });
-      toast.success('Etapa criada!');
+      toast.success('etapa criada');
       setNewForm({ nome: '', descricao: '', cor: COLORS[0] });
       setShowNewForm(false);
     } catch (error: any) {
@@ -143,7 +143,7 @@ const MacroEtapaManager = ({ open, onOpenChange, projetoId }: MacroEtapaManagerP
     if (!deleteTarget) return;
     try {
       await deleteMacroEtapa.mutateAsync({ id: deleteTarget.id, projetoId });
-      toast.success('Etapa excluída!');
+      toast.success('etapa excluída');
       setDeleteTarget(null);
     } catch (error: any) {
       toast.error(error.message || 'Erro ao excluir etapa');
@@ -174,7 +174,7 @@ const MacroEtapaManager = ({ open, onOpenChange, projetoId }: MacroEtapaManagerP
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Gerenciar Macro Etapas</DialogTitle>
+            <DialogTitle className="lowercase">gerenciar macro etapas</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-2 py-2">
@@ -213,17 +213,17 @@ const MacroEtapaManager = ({ open, onOpenChange, projetoId }: MacroEtapaManagerP
                       </div>
                     </div>
                     <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="sm" onClick={handleCancelEdit} className="gap-1">
-                        <X className="h-3.5 w-3.5" aria-hidden="true" /> Cancelar
+                      <Button variant="ghost" size="sm" onClick={handleCancelEdit} className="gap-1 lowercase">
+                        <X className="h-3.5 w-3.5" aria-hidden="true" /> cancelar
                       </Button>
                       <Button
                         size="sm"
                         onClick={handleSaveEdit}
                         disabled={updateMacroEtapa.isPending}
-                        className="gap-1"
+                        className="gap-1 lowercase"
                       >
                         <Check className="h-3.5 w-3.5" aria-hidden="true" />
-                        {updateMacroEtapa.isPending ? 'Salvando...' : 'Salvar'}
+                        {updateMacroEtapa.isPending ? 'salvando...' : 'salvar'}
                       </Button>
                     </div>
                   </div>
@@ -332,18 +332,18 @@ const MacroEtapaManager = ({ open, onOpenChange, projetoId }: MacroEtapaManagerP
                       setShowNewForm(false);
                       setNewForm({ nome: '', descricao: '', cor: COLORS[0] });
                     }}
-                    className="gap-1"
+                    className="gap-1 lowercase"
                   >
-                    <X className="h-3.5 w-3.5" aria-hidden="true" /> Cancelar
+                    <X className="h-3.5 w-3.5" aria-hidden="true" /> cancelar
                   </Button>
                   <Button
                     size="sm"
                     onClick={handleCreate}
                     disabled={createMacroEtapa.isPending}
-                    className="gap-1"
+                    className="gap-1 lowercase"
                   >
                     <Check className="h-3.5 w-3.5" aria-hidden="true" />
-                    {createMacroEtapa.isPending ? 'Criando...' : 'Criar'}
+                    {createMacroEtapa.isPending ? 'criando...' : 'criar'}
                   </Button>
                 </div>
               </div>
@@ -351,11 +351,11 @@ const MacroEtapaManager = ({ open, onOpenChange, projetoId }: MacroEtapaManagerP
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full gap-2 border-dashed"
+                className="w-full gap-2 border-dashed lowercase"
                 onClick={() => setShowNewForm(true)}
               >
                 <Plus className="h-4 w-4" aria-hidden="true" />
-                Nova Etapa
+                nova etapa
               </Button>
             )}
           </div>
@@ -365,7 +365,7 @@ const MacroEtapaManager = ({ open, onOpenChange, projetoId }: MacroEtapaManagerP
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir etapa "{deleteTarget?.titulo}"?</AlertDialogTitle>
+            <AlertDialogTitle className="lowercase">excluir etapa "{deleteTarget?.titulo}"?</AlertDialogTitle>
             <AlertDialogDescription>
               {(() => {
                 const count = deleteTarget ? (acoesCountByEtapa.get(deleteTarget.id) ?? 0) : 0;
@@ -377,12 +377,12 @@ const MacroEtapaManager = ({ open, onOpenChange, projetoId }: MacroEtapaManagerP
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel className="lowercase">cancelar</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 lowercase"
             >
-              {deleteMacroEtapa.isPending ? 'Excluindo...' : 'Excluir'}
+              {deleteMacroEtapa.isPending ? 'excluindo...' : 'excluir'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

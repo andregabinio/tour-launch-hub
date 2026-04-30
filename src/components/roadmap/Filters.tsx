@@ -58,21 +58,21 @@ const Filters = ({ filters, onChange, acoes, filteredCount, totalCount }: Filter
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Buscar ações, responsáveis..."
+            placeholder="buscar ações, responsáveis..."
             value={filters.busca}
             onChange={(e) => update('busca', e.target.value)}
             className="pl-9"
-            aria-label="Buscar ações"
+            aria-label="buscar ações"
           />
         </div>
         <div className="flex items-center gap-2">
           {hasActiveFilters && (
-            <Button variant="ghost" size="sm" onClick={() => onChange(defaultFilters)} className="gap-1 text-muted-foreground">
-              <X className="h-4 w-4" /> Limpar
+            <Button variant="ghost" size="sm" onClick={() => onChange(defaultFilters)} className="gap-1 text-muted-foreground lowercase">
+              <X className="h-4 w-4" /> limpar
             </Button>
           )}
           {filteredCount !== undefined && totalCount !== undefined && filteredCount !== totalCount && (
-            <span className="text-xs text-muted-foreground whitespace-nowrap">
+            <span className="text-xs text-muted-foreground whitespace-nowrap lowercase">
               {filteredCount} de {totalCount} ações
             </span>
           )}
@@ -80,65 +80,65 @@ const Filters = ({ filters, onChange, acoes, filteredCount, totalCount }: Filter
       </div>
       <div className="flex flex-wrap gap-2 items-center">
         <Select value={filters.macroEtapa} onValueChange={(v) => update('macroEtapa', v)}>
-          <SelectTrigger className="w-full sm:w-[180px]"><SelectValue placeholder="Macro etapa" /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-[180px] lowercase"><SelectValue placeholder="macro etapa" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="todas">Todas as etapas</SelectItem>
+            <SelectItem value="todas" className="lowercase">todas as etapas</SelectItem>
             {macroEtapas.map(e => <SelectItem key={e} value={e}>{e} ({countByEtapa(e)})</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={filters.responsavel} onValueChange={(v) => update('responsavel', v)}>
-          <SelectTrigger className="w-full sm:w-[170px]"><SelectValue placeholder="Responsável" /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-[170px] lowercase"><SelectValue placeholder="responsável" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="todos">Todos</SelectItem>
+            <SelectItem value="todos" className="lowercase">todos</SelectItem>
             {responsaveis.map(r => <SelectItem key={r} value={r}>{r} ({countByResponsavel(r)})</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={filters.prioridade} onValueChange={(v) => update('prioridade', v)}>
-          <SelectTrigger className="w-full sm:w-[140px]"><SelectValue placeholder="Prioridade" /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-[140px] lowercase"><SelectValue placeholder="prioridade" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="todas">Todas</SelectItem>
-            <SelectItem value="alta">Alta ({countByPrioridade('alta')})</SelectItem>
-            <SelectItem value="média">Média ({countByPrioridade('média')})</SelectItem>
-            <SelectItem value="baixa">Baixa ({countByPrioridade('baixa')})</SelectItem>
+            <SelectItem value="todas" className="lowercase">todas</SelectItem>
+            <SelectItem value="alta" className="lowercase">alta ({countByPrioridade('alta')})</SelectItem>
+            <SelectItem value="média" className="lowercase">média ({countByPrioridade('média')})</SelectItem>
+            <SelectItem value="baixa" className="lowercase">baixa ({countByPrioridade('baixa')})</SelectItem>
           </SelectContent>
         </Select>
         <Select value={filters.status} onValueChange={(v) => update('status', v)}>
-          <SelectTrigger className="w-full sm:w-[160px]"><SelectValue placeholder="Status" /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-[160px] lowercase"><SelectValue placeholder="status" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="todos">Todos</SelectItem>
-            <SelectItem value="não iniciada">Não iniciada ({countByStatus('não iniciada')})</SelectItem>
-            <SelectItem value="em andamento">Em andamento ({countByStatus('em andamento')})</SelectItem>
-            <SelectItem value="concluída">Concluída ({countByStatus('concluída')})</SelectItem>
+            <SelectItem value="todos" className="lowercase">todos</SelectItem>
+            <SelectItem value="não iniciada" className="lowercase">não iniciada ({countByStatus('não iniciada')})</SelectItem>
+            <SelectItem value="em andamento" className="lowercase">em andamento ({countByStatus('em andamento')})</SelectItem>
+            <SelectItem value="concluída" className="lowercase">concluída ({countByStatus('concluída')})</SelectItem>
           </SelectContent>
         </Select>
         <Select value={filters.situacaoPrazo} onValueChange={(v) => update('situacaoPrazo', v)}>
-          <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Situação" /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-[150px] lowercase"><SelectValue placeholder="situação" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="todas">Todas</SelectItem>
-            <SelectItem value="no prazo">No prazo ({countBySituacao('no prazo')})</SelectItem>
-            <SelectItem value="atrasada">Atrasada ({countBySituacao('atrasada')})</SelectItem>
+            <SelectItem value="todas" className="lowercase">todas</SelectItem>
+            <SelectItem value="no prazo" className="lowercase">no prazo ({countBySituacao('no prazo')})</SelectItem>
+            <SelectItem value="atrasada" className="lowercase">atrasada ({countBySituacao('atrasada')})</SelectItem>
           </SelectContent>
         </Select>
         <Select value={filters.bloqueada} onValueChange={(v) => update('bloqueada', v)}>
-          <SelectTrigger className="w-full sm:w-[140px]"><SelectValue placeholder="Bloqueada" /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-[140px] lowercase"><SelectValue placeholder="bloqueada" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="todas">Todas</SelectItem>
-            <SelectItem value="sim">Bloqueadas</SelectItem>
-            <SelectItem value="não">Não bloqueadas</SelectItem>
+            <SelectItem value="todas" className="lowercase">todas</SelectItem>
+            <SelectItem value="sim" className="lowercase">bloqueadas</SelectItem>
+            <SelectItem value="não" className="lowercase">não bloqueadas</SelectItem>
           </SelectContent>
         </Select>
 
         <div className="hidden sm:block w-px h-6 bg-border mx-1" />
 
         <Select value={filters.ordenarPor} onValueChange={(v) => update('ordenarPor', v)}>
-          <SelectTrigger className="w-full sm:w-[150px] gap-1">
+          <SelectTrigger className="w-full sm:w-[150px] gap-1 lowercase">
             <ArrowUpDown className="h-3.5 w-3.5 shrink-0" />
-            <SelectValue placeholder="Ordenar por" />
+            <SelectValue placeholder="ordenar por" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="prazo">Prazo</SelectItem>
-            <SelectItem value="prioridade">Prioridade</SelectItem>
-            <SelectItem value="responsavel">Responsável</SelectItem>
+            <SelectItem value="prazo" className="lowercase">prazo</SelectItem>
+            <SelectItem value="prioridade" className="lowercase">prioridade</SelectItem>
+            <SelectItem value="responsavel" className="lowercase">responsável</SelectItem>
           </SelectContent>
         </Select>
       </div>

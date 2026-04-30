@@ -43,7 +43,7 @@ const UserManagement = ({ open, onOpenChange }: UserManagementProps) => {
       .order('created_at');
 
     if (error) {
-      toast.error('Erro ao carregar usuários');
+      toast.error('erro ao carregar acessos');
     } else {
       setUsers((data ?? []) as Profile[]);
     }
@@ -57,9 +57,9 @@ const UserManagement = ({ open, onOpenChange }: UserManagementProps) => {
       .eq('id', userId);
 
     if (error) {
-      toast.error('Erro ao atualizar role');
+      toast.error('erro ao atualizar permissão');
     } else {
-      toast.success('Role atualizado');
+      toast.success('permissão atualizada');
       setUsers(prev =>
         prev.map(u => (u.id === userId ? { ...u, role: newRole } : u))
       );
@@ -70,18 +70,18 @@ const UserManagement = ({ open, onOpenChange }: UserManagementProps) => {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Gerenciar Usuários</DialogTitle>
+          <DialogTitle className="lowercase">gerenciar acessos</DialogTitle>
         </DialogHeader>
         {loading ? (
-          <div className="py-8 text-center text-muted-foreground">Carregando...</div>
+          <div className="py-8 text-center text-muted-foreground lowercase">um momento...</div>
         ) : (
           <div className="overflow-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b text-left text-muted-foreground">
-                  <th className="pb-2 font-medium">Nome</th>
-                  <th className="pb-2 font-medium">Email</th>
-                  <th className="pb-2 font-medium">Role</th>
+                <tr className="border-b text-left text-muted-foreground [&_th]:lowercase">
+                  <th className="pb-2 font-medium">nome</th>
+                  <th className="pb-2 font-medium">e-mail</th>
+                  <th className="pb-2 font-medium">permissão</th>
                 </tr>
               </thead>
               <tbody>
@@ -91,7 +91,7 @@ const UserManagement = ({ open, onOpenChange }: UserManagementProps) => {
                     <td className="py-3 text-muted-foreground">{u.email}</td>
                     <td className="py-3">
                       {u.id === user?.id ? (
-                        <span className="rounded bg-muted px-2 py-1 text-xs font-medium">
+                        <span className="rounded bg-muted px-2 py-1 text-xs font-medium lowercase">
                           {u.role} (você)
                         </span>
                       ) : (
@@ -99,13 +99,13 @@ const UserManagement = ({ open, onOpenChange }: UserManagementProps) => {
                           value={u.role}
                           onValueChange={(v) => updateRole(u.id, v as UserRole)}
                         >
-                          <SelectTrigger className="h-8 w-[120px]">
+                          <SelectTrigger className="h-8 w-[120px] lowercase">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="viewer">Viewer</SelectItem>
-                            <SelectItem value="editor">Editor</SelectItem>
-                            <SelectItem value="admin">Admin</SelectItem>
+                            <SelectItem value="viewer" className="lowercase">viewer</SelectItem>
+                            <SelectItem value="editor" className="lowercase">editor</SelectItem>
+                            <SelectItem value="admin" className="lowercase">admin</SelectItem>
                           </SelectContent>
                         </Select>
                       )}
