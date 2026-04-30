@@ -79,7 +79,7 @@ const AcaoEditDialog = ({ open, onOpenChange, acao, allAcoes = [], projetoId }: 
 
   const handleSubmit = async () => {
     if (!form.titulo || !form.macro_etapa_id || !form.data_inicio || !form.data_fim) {
-      toast.error('Preencha os campos obrigatórios');
+      toast.error('preencha os campos obrigatórios');
       return;
     }
 
@@ -94,19 +94,51 @@ const AcaoEditDialog = ({ open, onOpenChange, acao, allAcoes = [], projetoId }: 
       if (isEdit) {
         const { id, ...updates } = payload;
         await updateAcao.mutateAsync({ id, ...updates });
-        toast.success('Ação atualizada!');
+        toast.success('ação atualizada');
       } else {
         const { id: _id, ...createPayload } = payload;
         await createAcao.mutateAsync(createPayload as any);
-        toast.success('Ação criada!');
+        toast.success('ação criada');
       }
       onOpenChange(false);
     } catch (error: any) {
-      toast.error(error.message || 'Erro ao salvar');
+      toast.error(error.message || 'erro ao salvar');
     }
   };
 
   const set = (key: string, value: string) => setForm(prev => ({ ...prev, [key]: value }));
+
+  // Auto-calcula data_fim a partir de data_inicio + tempo_estimado.
+  // Aceita "X dia(s)", "X semana(s)", "X mes/mês/meses", "X hora(s)" (mesmo dia).
+  // Só dispara na criação — em edição respeitamos o que o user digitou.
+  useEffect(() => {
+    if (isEdit) return;
+    if (!form.data_inicio || !form.tempo_estimado) return;
+
+    const m = form.tempo_estimado
+      .toLowerCase()
+      .trim()
+      .match(/^(\d+(?:[.,]\d+)?)\s*(hora|horas|h|dia|dias|d|semana|semanas|sem|mes|mês|meses|m)\b/);
+    if (!m) return;
+
+    const qtd = parseFloat(m[1].replace(',', '.'));
+    const unit = m[2];
+    let diasAdd = 0;
+    if (unit.startsWith('h')) diasAdd = 0;
+    else if (unit.startsWith('d')) diasAdd = Math.max(0, Math.round(qtd) - 1);
+    else if (unit.startsWith('sem')) diasAdd = Math.max(0, Math.round(qtd * 7) - 1);
+    else if (unit.startsWith('m')) diasAdd = Math.max(0, Math.round(qtd * 30) - 1);
+
+    const inicio = new Date(form.data_inicio + 'T00:00:00');
+    if (Number.isNaN(inicio.getTime())) return;
+    inicio.setDate(inicio.getDate() + diasAdd);
+    const fim = inicio.toISOString().split('T')[0];
+
+    if (fim !== form.data_fim) {
+      setForm(prev => ({ ...prev, data_fim: fim }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.data_inicio, form.tempo_estimado, isEdit]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -118,12 +150,12 @@ const AcaoEditDialog = ({ open, onOpenChange, acao, allAcoes = [], projetoId }: 
           <div className={`grid ${isEdit ? 'grid-cols-2' : 'grid-cols-1'} gap-3`}>
             {isEdit && (
               <div className="space-y-1.5">
-                <Label>ID</Label>
-                <Input value={form.id} disabled />
+                <Label className="lowercase">id</Label>
+                <Input value={form.id} disabled className="font-mono text-xs" />
               </div>
             )}
             <div className="space-y-1.5">
-              <Label>Macro Etapa *</Label>
+              <Label className="lowercase">macro etapa *</Label>
               <Select value={form.macro_etapa_id} onValueChange={v => set('macro_etapa_id', v)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -135,73 +167,77 @@ const AcaoEditDialog = ({ open, onOpenChange, acao, allAcoes = [], projetoId }: 
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label>Título *</Label>
+            <Label className="lowercase">título *</Label>
             <Input value={form.titulo} onChange={e => set('titulo', e.target.value)} />
           </div>
           <div className="space-y-1.5">
-            <Label>Descrição</Label>
+            <Label className="lowercase">descrição</Label>
             <Textarea value={form.descricao} onChange={e => set('descricao', e.target.value)} rows={2} />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label>Responsável</Label>
+              <Label className="lowercase">responsável</Label>
               <Input value={form.responsavel} onChange={e => set('responsavel', e.target.value)} />
             </div>
             <div className="space-y-1.5">
-              <Label>Tempo Estimado</Label>
-              <Input value={form.tempo_estimado} onChange={e => set('tempo_estimado', e.target.value)} placeholder="ex: 2 dias" />
+              <Label className="lowercase">tempo estimado</Label>
+              <Input
+                value={form.tempo_estimado}
+                onChange={e => set('tempo_estimado', e.target.value)}
+                placeholder="ex: 2 dias, 1 semana, 3 meses"
+              />
             </div>
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div className="space-y-1.5">
-              <Label>Prioridade</Label>
+              <Label className="lowercase">prioridade</Label>
               <Select value={form.prioridade} onValueChange={v => set('prioridade', v)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger className="lowercase"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="alta">Alta</SelectItem>
-                  <SelectItem value="média">Média</SelectItem>
-                  <SelectItem value="baixa">Baixa</SelectItem>
+                  <SelectItem value="alta" className="lowercase">alta</SelectItem>
+                  <SelectItem value="média" className="lowercase">média</SelectItem>
+                  <SelectItem value="baixa" className="lowercase">baixa</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label>Status</Label>
+              <Label className="lowercase">status</Label>
               <Select value={form.status} onValueChange={v => set('status', v)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger className="lowercase"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="não iniciada">Não iniciada</SelectItem>
-                  <SelectItem value="em andamento">Em andamento</SelectItem>
-                  <SelectItem value="concluída">Concluída</SelectItem>
+                  <SelectItem value="não iniciada" className="lowercase">não iniciada</SelectItem>
+                  <SelectItem value="em andamento" className="lowercase">em andamento</SelectItem>
+                  <SelectItem value="concluída" className="lowercase">concluída</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label>Prazo</Label>
+              <Label className="lowercase">prazo</Label>
               <Select value={form.situacao_prazo} onValueChange={v => set('situacao_prazo', v)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger className="lowercase"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="no prazo">No prazo</SelectItem>
-                  <SelectItem value="atrasada">Atrasada</SelectItem>
+                  <SelectItem value="no prazo" className="lowercase">no prazo</SelectItem>
+                  <SelectItem value="atrasada" className="lowercase">atrasada</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label>Data Início *</Label>
+              <Label className="lowercase">data início *</Label>
               <Input type="date" value={form.data_inicio} onChange={e => set('data_inicio', e.target.value)} />
             </div>
             <div className="space-y-1.5">
-              <Label>Data Fim *</Label>
+              <Label className="lowercase">data fim *</Label>
               <Input type="date" value={form.data_fim} onChange={e => set('data_fim', e.target.value)} />
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label>Depende de (ID da ação)</Label>
+            <Label className="lowercase">depende de (id da ação)</Label>
             <Select value={form.dependencia_de || '_none'} onValueChange={v => set('dependencia_de', v === '_none' ? '' : v)}>
-              <SelectTrigger><SelectValue placeholder="Nenhuma" /></SelectTrigger>
+              <SelectTrigger className="lowercase"><SelectValue placeholder="nenhuma" /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="_none">Nenhuma</SelectItem>
+                <SelectItem value="_none" className="lowercase">nenhuma</SelectItem>
                 {allAcoes?.filter(a => a.id !== form.id).map(a => (
                   <SelectItem key={a.id} value={a.id}>{a.id} — {a.titulo}</SelectItem>
                 ))}
