@@ -108,39 +108,29 @@ const AcaoEditDialog = ({ open, onOpenChange, acao, allAcoes = [], projetoId }: 
 
   const set = (key: string, value: string) => setForm(prev => ({ ...prev, [key]: value }));
 
-  // Auto-calcula data_fim a partir de data_inicio + tempo_estimado (só na criação).
-  // Aceita "X dia(s)", "X semana(s)", "X mes/mês/meses", "X hora(s)".
-  // Sem tempo_estimado ou formato não reconhecido → data_fim = data_inicio.
+  // Auto-calcula tempo_estimado em dias corridos (inclusivo) a partir de
+  // data_inicio + data_fim. Sempre read-only, em criação e em edição.
+  // Mesmo dia = 1 dia. Fim < início → vazio.
   useEffect(() => {
-    if (isEdit) return;
-    if (!form.data_inicio) return;
+    if (!form.data_inicio || !form.data_fim) return;
+    const inicio = new Date(form.data_inicio + 'T00:00:00');
+    const fim = new Date(form.data_fim + 'T00:00:00');
+    if (Number.isNaN(inicio.getTime()) || Number.isNaN(fim.getTime())) return;
 
-    let diasAdd = 0;
-    if (form.tempo_estimado) {
-      const m = form.tempo_estimado
-        .toLowerCase()
-        .trim()
-        .match(/^(\d+(?:[.,]\d+)?)\s*(hora|horas|h|dia|dias|d|semana|semanas|sem|mes|mês|meses|m)\b/);
-      if (m) {
-        const qtd = parseFloat(m[1].replace(',', '.'));
-        const unit = m[2];
-        if (unit.startsWith('h')) diasAdd = 0;
-        else if (unit.startsWith('d')) diasAdd = Math.max(0, Math.round(qtd) - 1);
-        else if (unit.startsWith('sem')) diasAdd = Math.max(0, Math.round(qtd * 7) - 1);
-        else if (unit.startsWith('m')) diasAdd = Math.max(0, Math.round(qtd * 30) - 1);
-      }
+    const diffMs = fim.getTime() - inicio.getTime();
+    const diffDias = Math.floor(diffMs / 86400000);
+
+    let novoTempo = '';
+    if (diffDias >= 0) {
+      const total = diffDias + 1;
+      novoTempo = total === 1 ? '1 dia' : `${total} dias`;
     }
 
-    const inicio = new Date(form.data_inicio + 'T00:00:00');
-    if (Number.isNaN(inicio.getTime())) return;
-    inicio.setDate(inicio.getDate() + diasAdd);
-    const fim = inicio.toISOString().split('T')[0];
-
-    if (fim !== form.data_fim) {
-      setForm(prev => ({ ...prev, data_fim: fim }));
+    if (novoTempo !== form.tempo_estimado) {
+      setForm(prev => ({ ...prev, tempo_estimado: novoTempo }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.data_inicio, form.tempo_estimado, isEdit]);
+  }, [form.data_inicio, form.data_fim]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -185,9 +175,13 @@ const AcaoEditDialog = ({ open, onOpenChange, acao, allAcoes = [], projetoId }: 
               <Label className="lowercase">tempo estimado</Label>
               <Input
                 value={form.tempo_estimado}
-                onChange={e => set('tempo_estimado', e.target.value)}
-                placeholder="ex: 2 dias, 1 semana, 3 meses"
+                disabled
+                className="bg-muted cursor-not-allowed opacity-90"
+                placeholder="—"
               />
+              <p className="text-[11px] text-muted-foreground lowercase">
+                calculado em dias corridos a partir das datas
+              </p>
             </div>
           </div>
           <div className="grid grid-cols-3 gap-3">
@@ -235,16 +229,7 @@ const AcaoEditDialog = ({ open, onOpenChange, acao, allAcoes = [], projetoId }: 
                 type="date"
                 value={form.data_fim}
                 onChange={e => set('data_fim', e.target.value)}
-                disabled={!isEdit}
-                className={!isEdit ? 'bg-muted cursor-not-allowed opacity-90' : ''}
               />
-              {!isEdit && (
-                <p className="text-[11px] text-muted-foreground lowercase">
-                  {form.tempo_estimado
-                    ? 'calculado a partir do tempo estimado'
-                    : 'informe o tempo estimado para calcular'}
-                </p>
-              )}
             </div>
           </div>
           <div className="space-y-1.5">
