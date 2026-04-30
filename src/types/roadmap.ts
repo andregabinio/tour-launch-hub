@@ -37,6 +37,16 @@ export interface MacroEtapa {
   projetoId: string;
 }
 
+export interface Marco {
+  id: string;
+  projetoId: string;
+  nome: string;
+  descricao: string;
+  data: string;
+  cor: string;
+  createdAt: string;
+}
+
 export type UserRole = 'admin' | 'editor' | 'viewer';
 
 export interface Profile {

@@ -21,12 +21,13 @@ interface TopBarProps {
   onCreateAcao?: () => void;
   projetoNome?: string;
   onManageEtapas?: () => void;
+  onManageMarcos?: () => void;
   onSaveAsTemplate?: () => void;
   onArchiveProjeto?: () => void;
   onImportCsv?: () => void;
 }
 
-const TopBar = ({ viewMode, onViewModeChange, onOpenAdmin, onCreateAcao, projetoNome, onManageEtapas, onSaveAsTemplate, onArchiveProjeto, onImportCsv }: TopBarProps) => {
+const TopBar = ({ viewMode, onViewModeChange, onOpenAdmin, onCreateAcao, projetoNome, onManageEtapas, onManageMarcos, onSaveAsTemplate, onArchiveProjeto, onImportCsv }: TopBarProps) => {
   const { profile, role } = useAuthContext();
   const { signOut } = useAuth();
   const navigate = useNavigate();
@@ -127,6 +128,11 @@ const TopBar = ({ viewMode, onViewModeChange, onOpenAdmin, onCreateAcao, projeto
                 {onManageEtapas && (
                   <DropdownMenuItem onClick={onManageEtapas} className="gap-2 lowercase">
                     gerenciar macro etapas
+                  </DropdownMenuItem>
+                )}
+                {onManageMarcos && (
+                  <DropdownMenuItem onClick={onManageMarcos} className="gap-2 lowercase">
+                    gerenciar marcos
                   </DropdownMenuItem>
                 )}
                 {onSaveAsTemplate && (

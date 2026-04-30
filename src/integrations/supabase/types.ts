@@ -131,6 +131,50 @@ export type Database = {
           },
         ]
       }
+      marcos: {
+        Row: {
+          id: string
+          projeto_id: string
+          nome: string
+          descricao: string
+          data: string
+          cor: string
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          projeto_id: string
+          nome: string
+          descricao?: string
+          data: string
+          cor?: string
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          projeto_id?: string
+          nome?: string
+          descricao?: string
+          data?: string
+          cor?: string
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marcos_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "projetos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string

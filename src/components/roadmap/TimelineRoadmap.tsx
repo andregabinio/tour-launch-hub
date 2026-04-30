@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { ChevronDown, ChevronUp, User, Clock, Link, Lock, AlertTriangle, Pencil, X } from 'lucide-react';
-import { Acao, MacroEtapa } from '@/types/roadmap';
+import { ChevronDown, ChevronUp, User, Clock, Link, Lock, AlertTriangle, Pencil, X, Flag } from 'lucide-react';
+import { Acao, MacroEtapa, Marco } from '@/types/roadmap';
 import { StatusBadge, PrioridadeBadge, SituacaoPrazoBadge } from './StatusBadge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,7 @@ interface TimelineRoadmapProps {
   acoes: Acao[];
   allAcoes: Acao[];
   macroEtapas: MacroEtapa[];
+  marcos?: Marco[];
   onEditAcao?: (acao: Acao) => void;
 }
 
@@ -213,7 +214,7 @@ const AcaoDetail = ({ acao, allAcoes, onClose, onEdit }: { acao: Acao; allAcoes:
   );
 };
 
-const TimelineRoadmap = ({ acoes, allAcoes, macroEtapas, onEditAcao }: TimelineRoadmapProps) => {
+const TimelineRoadmap = ({ acoes, allAcoes, macroEtapas, marcos = [], onEditAcao }: TimelineRoadmapProps) => {
   const [selectedAcaoId, setSelectedAcaoId] = useState<string | null>(null);
   const selectedAcao = selectedAcaoId ? allAcoes.find(a => a.id === selectedAcaoId) ?? null : null;
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -338,19 +339,55 @@ const TimelineRoadmap = ({ acoes, allAcoes, macroEtapas, onEditAcao }: TimelineR
               </div>
 
               {/* Week headers */}
-              <div className="flex h-10 border-b border-border bg-muted/20 sticky top-8 z-[5]">
+              <div className="relative flex h-10 border-b border-border bg-muted/20 sticky top-8 z-[5]">
                 {columns.map((col, i) => {
                   const isToday = i === todayColIndex;
                   return (
                     <div
                       key={i}
-                      className={`text-[11px] font-medium flex items-center justify-center border-r border-border/50 ${
-                        isToday ? 'text-primary font-semibold bg-primary/5' : 'text-muted-foreground'
+                      className={`text-[11px] font-medium flex items-center justify-center border-r border-border/50 lowercase ${
+                        isToday ? 'text-brand-bordo font-bold bg-brand-bordo/10' : 'text-muted-foreground'
                       }`}
                       style={{ width: COLUMN_WIDTH }}
                     >
-                      {isToday ? '● Hoje' : `Sem ${col.label}`}
+                      {isToday ? '● hoje' : `sem ${col.label}`}
                     </div>
+                  );
+                })}
+                {/* Marco flags no header */}
+                {marcos.map((marco) => {
+                  const left = getPosition(marco.data);
+                  if (left < 0 || left > totalWidth) return null;
+                  return (
+                    <Tooltip key={marco.id}>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          className="absolute -top-1 -translate-x-1/2 z-10 hover:scale-110 transition-transform"
+                          style={{ left }}
+                          aria-label={`marco: ${marco.nome}`}
+                        >
+                          <Flag
+                            className="h-4 w-4 drop-shadow-sm"
+                            style={{ color: marco.cor, fill: marco.cor }}
+                            strokeWidth={2}
+                          />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-[260px]">
+                        <div className="space-y-0.5">
+                          <p className="font-semibold lowercase">{marco.nome}</p>
+                          <p className="text-[11px] opacity-80 lowercase">
+                            {new Date(marco.data + 'T00:00:00').toLocaleDateString('pt-BR', {
+                              day: '2-digit', month: 'short', year: 'numeric',
+                            })}
+                          </p>
+                          {marco.descricao && (
+                            <p className="text-[11px] opacity-80 mt-1">{marco.descricao}</p>
+                          )}
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
                   );
                 })}
               </div>
@@ -375,11 +412,26 @@ const TimelineRoadmap = ({ acoes, allAcoes, macroEtapas, onEditAcao }: TimelineR
                       ))}
                     </div>
 
-                    {/* Today marker */}
+                    {/* Marco lines — verticais coloridas */}
+                    {marcos.map((marco) => {
+                      const left = getPosition(marco.data);
+                      if (left < 0 || left > totalWidth) return null;
+                      return (
+                        <div
+                          key={marco.id}
+                          className="absolute top-0 bottom-0 w-[2px] z-[3] pointer-events-none opacity-70"
+                          style={{ left, backgroundColor: marco.cor }}
+                          aria-hidden="true"
+                        />
+                      );
+                    })}
+
+                    {/* Today marker — linha vermelha do hoje */}
                     {isTodayVisible && (
                       <div
-                        className="absolute top-0 bottom-0 w-0.5 bg-primary/60 z-[2]"
+                        className="absolute top-0 bottom-0 w-[2px] bg-brand-bordo z-20 pointer-events-none shadow-[0_0_0_1px_rgba(147,37,63,0.15)]"
                         style={{ left: todayOffset }}
+                        aria-hidden="true"
                       />
                     )}
 

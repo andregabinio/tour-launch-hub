@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useProjeto, useUpdateProjeto } from '@/hooks/useProjetos';
 import { useAcoes } from '@/hooks/useAcoes';
 import { useMacroEtapas } from '@/hooks/useMacroEtapas';
+import { useMarcos } from '@/hooks/useMarcos';
 import { Acao } from '@/types/roadmap';
 import TopBar, { type ViewMode } from '@/components/roadmap/TopBar';
 import SummaryCards, { type CardFilterKey } from '@/components/roadmap/SummaryCards';
@@ -13,6 +14,7 @@ import RoadmapView from '@/components/roadmap/RoadmapView';
 import UserManagement from '@/components/admin/UserManagement';
 import AcaoEditDialog from '@/components/roadmap/AcaoEditDialog';
 import MacroEtapaManager from '@/components/roadmap/MacroEtapaManager';
+import MarcoManager from '@/components/roadmap/MarcoManager';
 import SaveAsTemplateDialog from '@/components/roadmap/SaveAsTemplateDialog';
 import CsvImportDialog from '@/components/csv-import/CsvImportDialog';
 import { RefreshCw, AlertCircle, ArrowLeft } from 'lucide-react';
@@ -31,6 +33,7 @@ const ProjetoPage = () => {
   const { data: projeto, isLoading: projetoLoading, error: projetoError } = useProjeto(id);
   const { data: acoes = [], isLoading: acoesLoading, error: acoesError } = useAcoes(id);
   const { data: macroEtapas = [] } = useMacroEtapas(id);
+  const { data: marcos = [] } = useMarcos(id);
   const updateProjeto = useUpdateProjeto();
 
   const [viewMode, setViewMode] = useState<ViewMode>('timeline');
@@ -40,6 +43,7 @@ const ProjetoPage = () => {
   const [editingAcao, setEditingAcao] = useState<Acao | null>(null);
   const [showCreateAcao, setShowCreateAcao] = useState(false);
   const [showMacroManager, setShowMacroManager] = useState(false);
+  const [showMarcoManager, setShowMarcoManager] = useState(false);
   const [showSaveTemplate, setShowSaveTemplate] = useState(false);
   const [showCsvImport, setShowCsvImport] = useState(false);
 
@@ -224,6 +228,7 @@ const ProjetoPage = () => {
         onCreateAcao={() => setShowCreateAcao(true)}
         projetoNome={projeto?.nome}
         onManageEtapas={() => setShowMacroManager(true)}
+        onManageMarcos={() => setShowMarcoManager(true)}
         onSaveAsTemplate={() => setShowSaveTemplate(true)}
         onArchiveProjeto={handleArchiveProjeto}
         onImportCsv={() => setShowCsvImport(true)}
@@ -264,6 +269,7 @@ const ProjetoPage = () => {
             acoes={filteredAcoes}
             allAcoes={processedAcoes}
             macroEtapas={macroEtapas}
+            marcos={marcos}
             onEditAcao={setEditingAcao}
           />
         ) : viewMode === 'cards' ? (
@@ -295,6 +301,13 @@ const ProjetoPage = () => {
         <MacroEtapaManager
           open={showMacroManager}
           onOpenChange={setShowMacroManager}
+          projetoId={id}
+        />
+      )}
+      {id && (
+        <MarcoManager
+          open={showMarcoManager}
+          onOpenChange={setShowMarcoManager}
           projetoId={id}
         />
       )}
