@@ -139,13 +139,7 @@ const AcaoEditDialog = ({ open, onOpenChange, acao, allAcoes = [], projetoId }: 
           <DialogTitle className="lowercase">{isEdit ? 'editar ação' : 'nova ação'}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
-          <div className={`grid ${isEdit ? 'grid-cols-2' : 'grid-cols-1'} gap-3`}>
-            {isEdit && (
-              <div className="space-y-1.5">
-                <Label className="lowercase">id</Label>
-                <Input value={form.id} disabled className="font-mono text-xs" />
-              </div>
-            )}
+          <div className="grid grid-cols-1 gap-3">
             <div className="space-y-1.5">
               <Label className="lowercase">macro etapa *</Label>
               <Select value={form.macro_etapa_id} onValueChange={v => set('macro_etapa_id', v)}>
@@ -233,13 +227,13 @@ const AcaoEditDialog = ({ open, onOpenChange, acao, allAcoes = [], projetoId }: 
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label className="lowercase">depende de (id da ação)</Label>
+            <Label className="lowercase">depende de</Label>
             <Select value={form.dependencia_de || '_none'} onValueChange={v => set('dependencia_de', v === '_none' ? '' : v)}>
               <SelectTrigger className="lowercase"><SelectValue placeholder="nenhuma" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="_none" className="lowercase">nenhuma</SelectItem>
                 {allAcoes?.filter(a => a.id !== form.id).map(a => (
-                  <SelectItem key={a.id} value={a.id}>{a.id} — {a.titulo}</SelectItem>
+                  <SelectItem key={a.id} value={a.id}>{a.titulo}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -257,7 +251,7 @@ const AcaoEditDialog = ({ open, onOpenChange, acao, allAcoes = [], projetoId }: 
                 <AlertDialogHeader>
                   <AlertDialogTitle className="lowercase">excluir ação?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    A ação <strong>{acao?.id} — {acao?.titulo}</strong> e todas as suas subtarefas serão excluídas permanentemente.
+                    A ação <strong>{acao?.titulo}</strong> e todas as suas subtarefas serão excluídas permanentemente.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

@@ -27,6 +27,8 @@ const TableView = ({ acoes, onEditAcao }: TableViewProps) => {
   const updateAcao = useUpdateAcao();
   const deleteAcao = useDeleteAcao();
 
+  const tituloById = new Map(acoes.map(a => [a.id, a.titulo]));
+
   const cycleStatus = async (acao: Acao) => {
     if (!canEdit) return;
     const next = acao.status === 'não iniciada' ? 'em andamento' : acao.status === 'em andamento' ? 'concluída' : 'não iniciada';
@@ -52,7 +54,6 @@ const TableView = ({ acoes, onEditAcao }: TableViewProps) => {
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50 [&_th]:lowercase">
-              <TableHead className="w-[80px]">id</TableHead>
               <TableHead>título</TableHead>
               <TableHead className="hidden lg:table-cell">macro etapa</TableHead>
               <TableHead>responsável</TableHead>
@@ -80,7 +81,6 @@ const TableView = ({ acoes, onEditAcao }: TableViewProps) => {
                     : ''
                 }
               >
-                <TableCell className="font-mono text-xs text-muted-foreground">{acao.id}</TableCell>
                 <TableCell className="font-medium text-sm max-w-[250px]">
                   <span className="line-clamp-1">{acao.titulo}</span>
                 </TableCell>
@@ -117,7 +117,7 @@ const TableView = ({ acoes, onEditAcao }: TableViewProps) => {
                   <SituacaoPrazoBadge situacao={acao.situacaoPrazo} />
                 </TableCell>
                 <TableCell className="text-xs hidden xl:table-cell">{acao.tempoEstimado}</TableCell>
-                <TableCell className="text-xs text-muted-foreground hidden xl:table-cell">{acao.dependenciaDe || '—'}</TableCell>
+                <TableCell className="text-xs text-muted-foreground hidden xl:table-cell">{acao.dependenciaDe ? (tituloById.get(acao.dependenciaDe) ?? '—') : '—'}</TableCell>
                 <TableCell className="text-center text-xs text-muted-foreground hidden sm:table-cell">
                   {acao.subtarefas.filter(s => s.status === 'concluída').length}/{acao.subtarefas.length}
                 </TableCell>
@@ -127,12 +127,12 @@ const TableView = ({ acoes, onEditAcao }: TableViewProps) => {
                 {canEdit && (
                   <TableCell>
                     <div className="flex items-center gap-0.5">
-                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEditAcao?.(acao)} aria-label={`Editar ação ${acao.id}`}>
+                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEditAcao?.(acao)} aria-label={`Editar ação ${acao.titulo}`}>
                         <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
                       </Button>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10" aria-label={`Excluir ação ${acao.id}`}>
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10" aria-label={`Excluir ação ${acao.titulo}`}>
                             <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                           </Button>
                         </AlertDialogTrigger>
@@ -140,7 +140,7 @@ const TableView = ({ acoes, onEditAcao }: TableViewProps) => {
                           <AlertDialogHeader>
                             <AlertDialogTitle className="lowercase">excluir ação?</AlertDialogTitle>
                             <AlertDialogDescription>
-                              A ação <strong>{acao.id} — {acao.titulo}</strong> e todas as suas subtarefas serão excluídas permanentemente.
+                              A ação <strong>{acao.titulo}</strong> e todas as suas subtarefas serão excluídas permanentemente.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
